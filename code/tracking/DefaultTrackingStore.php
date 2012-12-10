@@ -35,6 +35,7 @@ class DefaultTrackingStore implements TrackingStore {
 	}
 
 	function setProperties(TrackingIdentity $id, $properties) {
+        if (!is_numeric($id)) return; // do nothing if the identity is not provided
 		foreach ($properties as $key => $value) {
 			$item = DefaultTrackingStoreItem::get()
 				->filter("Key", $key)

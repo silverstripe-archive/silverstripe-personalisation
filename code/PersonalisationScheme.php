@@ -16,7 +16,7 @@ class PersonalisationScheme extends DataObject {
 
 	static function personalise_with($name) {
 		$scheme = DataObject::get_one("PersonalisationScheme", "\"Title\"='" . $name . "'");
-		return $scheme->personalise();
+		return $scheme ? $scheme->personalise() : null;
 	}
 }
 

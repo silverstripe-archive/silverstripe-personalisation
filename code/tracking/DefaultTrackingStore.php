@@ -55,12 +55,12 @@ class DefaultTrackingStore implements TrackingStore {
 	 * to use the new master identity.
 	 */
 	function mergeIdentities($masterIdentity, $mergeIdentities) {
-		$a = array();
-		foreach ($mergeIdentities as $i) $a[] = $i->ID;
-		$sql = "update \"DefaultTrackingStoreItem\" set \"TrackingIdentifierID\"=" .
-					$masterIdentity->ID .
-					" where TrackingIdentifierID in (" . implode(",", $a);
-		DB::query($sql);
+//		$a = array();
+//		foreach ($mergeIdentities as $i) $a[] = $i->ID;
+//		$sql = "update \"DefaultTrackingStoreItem\" set \"TrackingIdentifierID\"=" .
+//					$masterIdentity->ID .
+//					" where TrackingIdentifierID in (" . implode(",", $a);
+//		DB::query($sql);
 	}
 
 	static function _escape($s) {

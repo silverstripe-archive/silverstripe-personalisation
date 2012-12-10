@@ -1,0 +1,20 @@
+{
+	"name": "silverstripe/personalisation",
+	"type": "silverstripe-module",
+	"description": "The SilverStripe Personalisation Module",
+	"homepage": "http://silverstripe.org",
+	"license": "BSD-3-Clause",
+	"keywords": ["silverstripe", "personalisation"],
+	"authors": [
+		{
+			"name": "SilverStripe",
+			"homepage": "http://silverstripe.com"
+		},
+		{
+			"name": "SilveStripe Super Marvellous Team"
+		}
+	],
+	"require": {
+		"silverstripe/cms": "3.0.*"
+	}
+}

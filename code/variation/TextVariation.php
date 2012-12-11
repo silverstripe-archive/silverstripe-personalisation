@@ -5,7 +5,7 @@
  * with the relevant value from the context provider.
  */
 class TextVariation extends PersonalisationVariation {
-	static $has_one = array(
+	static $db = array(
 		"Text" => "HTMLText"
 	);
 

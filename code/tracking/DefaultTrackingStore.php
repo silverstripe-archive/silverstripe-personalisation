@@ -8,28 +8,28 @@ class DefaultTrackingStore implements TrackingStore {
 
 	function getProperties(TrackingIdentity $id, $properties) {
         if (!is_numeric($id)) return array(); // do nothing if the identity is not provided
+
+		if (!is_array($properties)) $properties = array($properties);
+
 		$result = array();
-		foreach ($properties as $name => $def) {
+		foreach ($properties as $property) {
 			$items = DefaultTrackingStoreItem::get()
 				->filter("TrackingIdentityID", $id->ID)
-				->where("\"Key\" = '" . $name . "'")
-				->sort("\"LastEdited\" desc");
-			$multiple = isset($def["multiple"]) && $def["multiple"];
-			$metadata = isset($def["metadata"]) && $def["metadata"];
-			if (!$multiple) {
-				$r = $items->First();
-				if (!$r) continue;
+				->where("\"Key\" = '" . $property->getName() . "'")
+				->sort("\"LastEdited\" desc")
+				->limit($property->getMaxRequested());
 
-				$v = self::json_decode_typed($r->Value);
-				if ($metadata) $r = array("value" => $v, "timestamp" => $r->LastEdited); // @todo LastEdited is not timestamp
-				else $r = $v;
-				$result[$name] = $r;
+			$values = array();
+			foreach ($items as $item) {
+				$values[] = new ContextProperty(array(
+					"name" => $property->name,
+					"value" => self::json_decode_typed($item->Value),
+					"confidence" => 100,  // we're completely sure of the request. @todo pull from db record
+					"timestamp" => $item->LastEdited
+				));
+
 			}
-			else {
-				// @todo complete implementation of retrieval of multiple objects.
-				// @todo filtering
-				$v = $items->toArray();
-			}
+			$result[$property->getName()] = $values;
 		}
 
 		return $result;

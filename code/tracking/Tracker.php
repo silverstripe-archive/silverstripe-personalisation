@@ -183,9 +183,8 @@ class Tracker {
 	/**
 	 * Retrieve a set of properties from tracking stores. If a store is named, then properties are only retrieved
 	 * from that store. If not, the stores are attempted in order.
-	 * @todo Consider having the properties having a weight, and using that in preference.
 	 * @static
-	 * @param $properties
+	 * @param array $properties		Array of ContextPropertyRequest objects
 	 * @param null $store
 	 * @return void
 	 */

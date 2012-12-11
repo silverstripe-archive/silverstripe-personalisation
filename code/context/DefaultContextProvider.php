@@ -2,13 +2,23 @@
 
 class DefaultContextProvider implements ContextProvider {
 
+	/**
+	 * A cache that maps cache keys derived from a property request to the value or values from fetching that
+	 * request. The value or values are ContextProperty objects.
+	 * @var array
+	 */
 	protected $propertyCache = array();
 
+	/**
+	 * A list of handlers that the context provider uses to determine values that are requested. Each of these is
+	 * an instance that implements ContextProvider.
+	 * @var array
+	 */
 	protected $handlers = array();
 
 	function __construct() {
-		$this->register_handler(array($this, "defaultHandler"));
-		$this->register_handler(array($this, "trackerHandler"));
+		$this->register_handler(new DefaultContextHandler());
+		$this->register_handler(new TrackerContextHandler());
 	}
 
 	/**
@@ -23,23 +33,22 @@ class DefaultContextProvider implements ContextProvider {
 
 		$result = array();
 
-		// Normalise properties, makes things easier later. i.e. all keys are property names, values are def of what
-		// info is required.
+		// Normalise properties, makes things easier later. We make it a map of property name to ContextPropertyRequest.
 		$np = array();
-		foreach ($properties as $name => $def) {
-			if (is_int($name)) {
-				$np[$def] = array(
-					"multiple" => false
-				);
+		foreach ($properties as $property) {
+			if (is_string($property)) {
+				$np[$property] = new ContextPropertyRequest(array("name" => $property));
 			}
+			else if (is_object($property) && $property instanceof ContextPropertyRequest)
+				$np[$property->getName()] = $property;
 			else
-				$np[$name] = $def;
+				throw new Exception("DefaultContextProvider::getProperties(): each property must be either a string or ContextPropertyRequest");
 		}
 
 		// First, determine if any of the properties requested are in the cache, if caching is being used.
 		if ($useCache) {
-			foreach ($np as $name => $def) {
-				$cacheKey = $this->getCacheKey($name, $def);
+			foreach ($np as $name => $req) {
+				$cacheKey = $this->getCacheKey($name, $req);
 
 				if (isset($this->propertyCache[$cacheKey])) $result[$name] = $this->propertyCache[$cacheKey];
 			}
@@ -60,7 +69,7 @@ class DefaultContextProvider implements ContextProvider {
 			$result = array_merge($result, $v);
 			if ($useCache) {
 				foreach ($v as $propertyName => $value) {
-					$cacheKey = $this->getCacheKey($name, $np[$name]);
+					$cacheKey = $this->getCacheKey($name, $np[$propertyName]);
 					$this->propertyCache[$cacheKey] = $value;
 				}
 			}
@@ -84,6 +93,15 @@ class DefaultContextProvider implements ContextProvider {
 	}
 
 	function defaultHandler($properties) {
+	}
+
+	function trackerHandler($properties) {
+	}
+}
+
+class DefaultContextHandler implements ContextProvider {
+
+	function getProperties($properties) {
 		$result = array();
 		foreach ($properties as $name => $def) {
 			$parts = explode(".", $name);
@@ -115,8 +133,12 @@ class DefaultContextProvider implements ContextProvider {
 			}
 
 			if ($v !== null) {
-				if (isset($def["multiple"]) && $def["multiple"]) $v = array($v);
-				if (isset($def["metadata"]) && $def["metadata"]) $v = array("value" => $v, "timestamp" => time());
+				$v = new ContextProperty(array(
+					"name" => $name,
+					"value" => $v,
+					"confidence" => 100  // we're completely sure of the request.
+				));
+				$v = array($v);			// always an array, even for single values
 				$result[$name] = $v;
 			}
 		}
@@ -125,7 +147,7 @@ class DefaultContextProvider implements ContextProvider {
 	}
 
 	function getBrowserProperty($parts) {
-
+		// @todo implement DefaultContextHandler::getBrowserProperty
 	}
 
 	function getRequestProperty($parts) {
@@ -156,7 +178,18 @@ class DefaultContextProvider implements ContextProvider {
 		return $_REQUEST[$parts[1]];
 	}
 
-	function trackerHandler($properties) {
+	function getMetadata($namespaces = null) {
+		// @todo implement DefaultContextHandler::getMetadata
+	}
+}
+
+class TrackerContextHandler implements ContextProvider {
+
+	function getProperties($properties) {
 		return Tracker::get_properties($properties, $store = null);
+	}
+
+	function getMetadata($namespaces = null) {
+
 	}
 }

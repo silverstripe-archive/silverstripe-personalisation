@@ -22,6 +22,9 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 		foreach ($rules as $rule)
 			$properties = array_merge($properties, $rule->getRequiredProperties());
 
+		// We fetch all the properties in one go. These will be cached so that calls within each rule are read from
+		// cache. While we might get more properties than we need, we're also reducing the latency to the tracking
+		// store.
 		$v = $context->getProperties($properties);
 
 		foreach ($rules as $rule) {

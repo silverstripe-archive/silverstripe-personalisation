@@ -41,8 +41,10 @@ class DefaultContextProvider implements ContextProvider {
 			}
 			else if (is_object($property) && $property instanceof ContextPropertyRequest)
 				$np[$property->getName()] = $property;
-			else
+			else {
+				die(print_r($properties,true));
 				throw new Exception("DefaultContextProvider::getProperties(): each property must be either a string or ContextPropertyRequest");
+			}
 		}
 
 		// First, determine if any of the properties requested are in the cache, if caching is being used.
@@ -63,7 +65,8 @@ class DefaultContextProvider implements ContextProvider {
 
 			if (count($request) == 0) break; // we have all properties requested, no need to keep looking.
 
-			$v = call_user_func($h, $request);
+			$v = $h->getProperties($request);
+//			$v = call_user_func($h, $request);
 
 			// Add responses from handler to result and to cache
 			$result = array_merge($result, $v);
@@ -83,7 +86,7 @@ class DefaultContextProvider implements ContextProvider {
 	}
 
 	// Return a map of properties that are understood and their type.
-	function getMetadata() {
+	function getMetadata($namespaces = null) {
 		return array();
 	}
 
@@ -180,6 +183,7 @@ class DefaultContextHandler implements ContextProvider {
 
 	function getMetadata($namespaces = null) {
 		// @todo implement DefaultContextHandler::getMetadata
+		return array();
 	}
 }
 

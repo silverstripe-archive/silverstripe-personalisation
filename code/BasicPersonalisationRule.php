@@ -19,8 +19,7 @@ class BasicPersonalisationRule extends DataObject {
 	 * @return array
 	 */
 	function getRequiredProperties() {
-		$result = array();
-		$result[$this->Property] = array("multiple" => false, "metadata" => false);
+		$result = array(new ContextPropertyRequest(array("name" => $this->Property)));
 		return $result;
 	}
 
@@ -28,11 +27,18 @@ class BasicPersonalisationRule extends DataObject {
 	function variationOnMatch($context) {
 		$props = $context->getProperties($this->getRequiredProperties());
 
-		// If the property is not known in the context, the rule doesn't match, as we have nothing to compare
-		if (!isset($props[$this->Property])) return null;
-		$v = $props[$this->Property];
+		// If the property is not known in the context, the rule doesn't match, as we have nothing to compare.
+		if (!isset($props[$this->Property]) || !is_array($props[$this->Property]) || count($props[$this->Property]) == 0) return null;
 
+		// we just take the first.
+		$v = $props[$this->Property][0];
+
+		// check for invalid property. Shouldn't happen, but neither should war or policitians and yet we have to put up with them.
+		if (!is_object($v) || !($v instanceof ContextProperty)) return null;
+
+		$v = $v->getValue();
 		$b = false;
+
 		switch ($this->Operator) {
 			case "Equals":
 				$b = ($v == $this->Value);

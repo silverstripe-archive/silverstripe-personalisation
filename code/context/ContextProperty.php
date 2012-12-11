@@ -26,6 +26,10 @@ class ContextProperty {
 			$this->$key = $value;
 		}
 	}
+
+	function getValue() {
+		return $this->value;
+	}
 }
 
 /**

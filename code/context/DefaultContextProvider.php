@@ -29,6 +29,7 @@ class DefaultContextProvider implements ContextProvider {
 	 * @returns array	Returns a map of property names to values. See TrackingStore::getProperties
 	 */
 	function getProperties($properties, $useCache = true) {
+		//print_r($properties);
 		if (!is_array($properties)) $properties = array($properties);
 
 		$result = array();
@@ -66,7 +67,6 @@ class DefaultContextProvider implements ContextProvider {
 			if (count($request) == 0) break; // we have all properties requested, no need to keep looking.
 
 			$v = $h->getProperties($request);
-//			$v = call_user_func($h, $request);
 
 			// Add responses from handler to result and to cache
 			$result = array_merge($result, $v);
@@ -93,12 +93,6 @@ class DefaultContextProvider implements ContextProvider {
 	function register_handler($handler, $place = "end") {
 		if ($place == "end") $this->handlers[] = $handler;
 		else array_unshift($this->handlers, $handler);
-	}
-
-	function defaultHandler($properties) {
-	}
-
-	function trackerHandler($properties) {
 	}
 }
 

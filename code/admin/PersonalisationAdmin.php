@@ -8,23 +8,33 @@ class PersonalisationAdmin extends ModelAdmin {
 
 	public static $managed_models = array('BasicPersonalisation');
 
+	public static function managed_personalisation_models() {
+
+		$classes = array();
+		foreach(ClassInfo::subclassesFor('PersonalisationScheme') as $i => $class) {
+			if($class == 'PersonalisationScheme') continue;
+			if(ClassInfo::classImplements($class, 'TestOnly')) continue;
+
+			// if(singleton($class)->canCreate()) $classes[] = $class;
+			$classes[] = $class;
+		}
+		return $classes;
+	}
+
 
 	public function getList() {
+		
 		$context = $this->getSearchContext();
 		$params = $this->request->requestVar('q');
 		$list = $context->getResults($params);
 		
 		$newList = new ArrayList();
-		foreach($list as $e) {
-			$newList->push($e);
-		}
 		$extraList = PersonalisationScheme::get();
 		foreach($extraList as $e) {
 			$newList->push($e);
 		}
 		
 		$this->extend('updateList', $newList);
-		$newList->removeDuplicates();
 		return $newList;
 	}
 

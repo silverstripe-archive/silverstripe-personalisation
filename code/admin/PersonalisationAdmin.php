@@ -33,7 +33,11 @@ class PersonalisationAdmin extends ModelAdmin {
 	}
 
 	public function getEditForm($id = null, $fields = null) {
-		$list = PersonalisationScheme::get();
+		$tempList = PersonalisationScheme::get();
+		$list = new ArrayList();
+		if($tempList) foreach($tempList as $e) {
+			$list->push($e);
+		}
 		
 		$listField = GridField::create(
 			$this->sanitiseClassName($this->modelClass),

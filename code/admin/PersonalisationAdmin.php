@@ -15,9 +15,10 @@ class PersonalisationAdmin extends ModelAdmin {
 			if($class == 'PersonalisationScheme') continue;
 			if(ClassInfo::classImplements($class, 'TestOnly')) continue;
 
-			if(singleton($class)->canCreate()) $classes[] = $class;
+			// if(singleton($class)->canCreate()) $classes[] = $class;
 			$classes[] = $class;
 		}
+		
 		return $classes;
 	}
 
@@ -112,7 +113,6 @@ class GridFieldAddNewButton_Personalisation implements GridField_HTMLProvider {
 		$this->targetFragment = $targetFragment;
 	}
 
-
 	public function getHTMLFragments($gridField) {
 		if(!$this->buttonName) {
 			// provide a default button name, can be changed by calling {@link setButtonName()} on this component
@@ -129,5 +129,35 @@ class GridFieldAddNewButton_Personalisation implements GridField_HTMLProvider {
 			$this->targetFragment => $data->renderWith('GridFieldAddNewbutton'),
 		);
 	}
+
+
+	// public function getHTMLFragments($gridField) {
+
+	// 	if(!$this->buttonName) {
+	// 		$objectName = singleton($gridField->getModelClass())->i18n_singular_name();
+	// 		$this->buttonName = _t('GridField.Add', 'Add {name}', array('name' => $objectName));
+	// 	}
+	// 	$managedClasses = PersonalisationAdmin::managed_personalisation_models();
+		
+	// 	$buttons = new ArrayList();
+	// 	foreach($managedClasses as $managedClass) {
+	// 		$gridField->setModelClass($managedClass);
+	// 		$gridField->getForm()->setFormAction('admin/personalisation/'.$managedClass);
+	// 		$gridField->setName($managedClass);
+			
+	// 		$buttons->push(new ArrayData(array(
+	// 			'NewLink' => Controller::join_links($gridField->Link('item'), 'new'), 
+	// 			'ButtonName' => ucwords(trim(strtolower(preg_replace('/_?([A-Z])/', ' $1', $managedClass))))
+	// 		)));
+	// 	}
+
+	// 	$data = new ArrayData(array(
+	// 		'Buttons' => $buttons
+	// 	));
+
+	// 	return array(
+	// 		$this->targetFragment => $data->renderWith('GridFieldAddNewbutton_Personalisation'),
+	// 	);
+	// }
 
 }

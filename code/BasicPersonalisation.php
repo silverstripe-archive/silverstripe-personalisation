@@ -6,6 +6,56 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 		"Rules" => "BasicPersonalisationRule"
 	);
 
+	function getCMSFields() {
+		$fields = parent::getCMSFields();
+
+		$fields->removeByName('Rules');
+
+		$rules = $this->generateRulesList();
+		$gridFieldConfig = GridFieldConfig::create()->addComponents(
+			new GridFieldToolbarHeader(),
+			new GridFieldAddNewButton(),
+			new GridFieldDataColumns(),
+			new GridFieldPaginator(15),
+			new GridFieldEditButton(),
+			new GridFieldDeleteAction(),
+			new GridFieldDetailForm()
+			
+		);
+		$rulesField = new GridField('DecodedRules', 'Rules', $this->Rules(), $gridFieldConfig);
+		$fields->addFieldToTab('Root.Rules', $rulesField);
+		return $fields;
+	}
+
+	function generateRulesList() {
+		$rules = $this->Rules();
+
+		$html = 'RULE';
+		foreach($rules as $rule) {
+			$html .= $this->generateRuleHTML(BasicPersonalisationRule::json_decode_typed($rule->EncodedCondition));
+			$html .= 'RULE';
+		}
+		return $html;
+	}
+
+	function generateRuleHTML($rules) {
+
+		$rulesList = new ArrayList();
+		foreach($rules as $rule) {
+			
+			$rulesList->push(new ArrayData(array(
+				'Operator' => $rule->operator, 
+				'ParamOne' => $rule->param1->value,
+				'ParamTwo' => $rule->param2->value
+			)));
+		}
+
+
+		return $this->customise(array(
+				'Rules' => $rulesList
+		))->renderWith('GetCmsFieldRule');
+	}
+
 	/**
 	 * 
 	 * @param ContextProvider $context
@@ -52,3 +102,4 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 	}
 
 }
+

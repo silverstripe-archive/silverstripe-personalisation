@@ -12,6 +12,38 @@ class BasicPersonalisationRule extends DataObject {
 		"Variation" => "PersonalisationVariation"
 	);
 
+	static $summary_fields = array(
+		'NiceDecodedCondition'
+	);
+
+	function getCMSFields() {
+		$fields = parent::getCMSFields();
+		return $fields;
+	}
+
+	function NiceDecodedCondition() {
+		$rules = BasicPersonalisationRule::json_decode_typed($this->EncodedCondition);
+		return $this->generateRuleHTML($rules);
+	}
+
+	function generateRuleHTML($rules) {
+
+		$rulesList = new ArrayList();
+		foreach($rules as $rule) {
+			
+			$rulesList->push(new ArrayData(array(
+				'Operator' => $rule->operator, 
+				'ParamOne' => $rule->param1->value,
+				'ParamTwo' => $rule->param2->value
+			)));
+		}
+
+
+		return $this->customise(array(
+				'Rules' => $rulesList
+		))->renderWith('GetCmsFieldRule');
+	}
+
 	/**
 	 * Retrieve the condition for this rule. The condition will actually be an array of BasicPersonalisationCondition
 	 * objects that have been serialised into EncodedCondition. If there are no conditions, an empty array is returned.

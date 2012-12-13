@@ -79,6 +79,51 @@ class PersonalisationTest extends SapphireTest {
 		$var = $rule->variationOnMatch($context);
 		$this->assertTrue($var == null, "got no variation for a non-existent property");
 	}
+
+	function testContextMetadata() {
+		$context = new DefaultContextProvider();
+
+		// Get the entire namespace
+		$metadata = $context->getMetadata();
+		$this->assertTrue(is_array($metadata));
+		// we expect to see different name spaces. Lets look for 'request' and 'browser' to validate there are multiple.
+		$hasRequest = false;
+		$hasBrowser = false;
+		foreach ($metadata as $key => $value) {
+			$bits = explode(".", $key);
+			if (count($bits) < 1) continue;
+			switch ($bits[0]) {
+				case "request":
+					$hasRequest = true;
+					break;
+				case "browser":
+					$hasBrowser = true;
+					break;
+			}
+		}
+		$this->assertTrue($hasRequest, "All namespaces contains request.* items");
+		$this->assertTrue($hasBrowser, "All namespaces contains browser.* items");
+
+		// Return just what's in the request.
+		$metadata = $context->getMetadata("request");
+		$this->assertTrue(is_array($metadata));
+
+		// test that there are no non-"request." items, and that there is at least one.
+		$count = 0;
+		$fail = false;
+		foreach ($metadata as $key => $value) {
+			$bits = explode(".", $key);
+			if (count($bits) < 1 || $bits[0] != "request") $fail = true;
+			else $count++;
+		}
+		$this->assertTrue($fail == false, "Fetch of 'request' namespace should only contain 'request.*' items");
+		$this->assertTrue($count>0, "Fetch of 'request' namesapce should return at least one 'request.*' item");
+
+		// This looks like a partial name space, but we have to match whole components. So this should not find
+		// "request" items.
+		$metadata = $context->getMetadata("req");
+		$this->assertEquals(count($metadata), 0, "Expecting no results on a partial namespace component");
+	}
 }
 
 class PersonalisationTestCustomHandler implements ContextProvider {
@@ -94,5 +139,6 @@ class PersonalisationTestCustomHandler implements ContextProvider {
 	}
 
 	function getMetadata($namespaces = null) {
+		return array();
 	}
 }

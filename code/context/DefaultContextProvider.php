@@ -87,7 +87,13 @@ class DefaultContextProvider implements ContextProvider {
 
 	// Return a map of properties that are understood and their type.
 	function getMetadata($namespaces = null) {
-		return array();
+		$result = array();
+
+		foreach ($this->handlers as $h) {
+			$result = array_merge($result, $h->getMetadata($namespaces));
+		}
+
+		return $result;
 	}
 
 	function register_handler($handler, $place = "end") {
@@ -175,9 +181,34 @@ class DefaultContextHandler implements ContextProvider {
 		return $_REQUEST[$parts[1]];
 	}
 
+	static $metadata = array(
+		"browser.*"			=> "Text", 			// @todo expand browser property metadata
+		"request.method"	=> "Enum('GET,POST,PUT,DELETE','GET')",
+		"request.referer"	=> "Text",
+		"request.url"		=> "Text",
+		"cookie.*"			=> "Text",
+		"get.*"				=> "Text",
+		"location.*"		=> "Text"			// @todo expand location.* properties
+	);
+
 	function getMetadata($namespaces = null) {
-		// @todo implement DefaultContextHandler::getMetadata
-		return array();
+		$result = array();
+		if (!$namespaces) $namespaces = "*";
+		if (!is_array($namespaces)) $namespaces = array($namespaces);
+
+		foreach ($namespaces as $ns) {
+			// force match to full namespace components
+			if (substr($ns, -1) != ".") $ns .= ".";
+
+			foreach (self::$metadata as $property => $def) {
+				if ($ns == "*." || substr($property, 0, strlen($ns)) == $ns) {
+					// this property matches up to the length of the name space
+					$inst = Object::create_from_string($def);
+					$result[$property] = $inst;
+				}
+			}
+		}
+		return $result;
 	}
 }
 
@@ -188,6 +219,7 @@ class TrackerContextHandler implements ContextProvider {
 	}
 
 	function getMetadata($namespaces = null) {
-
+		// @todo implement TrackerContextHandler::getMetadata
+		return array();
 	}
 }

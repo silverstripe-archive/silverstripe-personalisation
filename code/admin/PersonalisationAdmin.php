@@ -28,19 +28,13 @@ class PersonalisationAdmin extends ModelAdmin {
 		$params = $this->request->requestVar('q');
 		$list = $context->getResults($params);
 		
-		$newList = new ArrayList();
-		$extraList = PersonalisationScheme::get();
-		if($extraList) foreach($extraList as $e) {
-			$newList->push($e);
-		}
-		
-		$this->extend('updateList', $newList);
-		return $newList;
+		$this->extend('updateList', $list);
+		return $list;
 	}
 
 	public function getEditForm($id = null, $fields = null) {
-		$list = $this->getList();
-
+		$list = PersonalisationScheme::get();
+		
 		$listField = GridField::create(
 			$this->sanitiseClassName($this->modelClass),
 			false,

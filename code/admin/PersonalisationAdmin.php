@@ -15,7 +15,7 @@ class PersonalisationAdmin extends ModelAdmin {
 			if($class == 'PersonalisationScheme') continue;
 			if(ClassInfo::classImplements($class, 'TestOnly')) continue;
 
-			// if(singleton($class)->canCreate()) $classes[] = $class;
+			if(singleton($class)->canCreate()) $classes[] = $class;
 			$classes[] = $class;
 		}
 		return $classes;
@@ -30,7 +30,7 @@ class PersonalisationAdmin extends ModelAdmin {
 		
 		$newList = new ArrayList();
 		$extraList = PersonalisationScheme::get();
-		foreach($extraList as $e) {
+		if($extraList) foreach($extraList as $e) {
 			$newList->push($e);
 		}
 		

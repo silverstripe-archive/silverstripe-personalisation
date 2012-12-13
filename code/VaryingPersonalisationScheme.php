@@ -50,4 +50,8 @@ class VaryingPersonalisationScheme extends PersonalisationScheme {
 		}
 		return new BasicSelectionProvider();
 	}
+
+	public function canCreate($member = null) {
+		return false;
+	}
 }

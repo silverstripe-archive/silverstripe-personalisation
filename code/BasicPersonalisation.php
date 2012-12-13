@@ -47,4 +47,8 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 		return $var->render();
 	}
 
+	function canCreate($member = null) {
+		return true;
+	}
+
 }

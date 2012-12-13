@@ -18,5 +18,9 @@ class PersonalisationScheme extends DataObject {
 		$scheme = DataObject::get_one("PersonalisationScheme", "\"Title\"='" . $name . "'");
 		return $scheme ? $scheme->personalise() : null;
 	}
+
+	public function canCreate($member = null) {
+		return false;
+	}
 }
 

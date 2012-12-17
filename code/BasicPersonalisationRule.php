@@ -3,6 +3,7 @@
 class BasicPersonalisationRule extends DataObject {
 
 	static $db = array(
+		'Title' => 'Varchar(255)',
 		// json encoded object represents an array of BasicPersonalisationCondition objects.
 		"EncodedCondition" => "Text"
 	);
@@ -18,6 +19,11 @@ class BasicPersonalisationRule extends DataObject {
 
 	function getCMSFields() {
 		$fields = parent::getCMSFields();
+		$fields->removeByName('EncodedCondition');
+		$fields->removeByName('ParentID');
+		$fields->removeByName('VariationID');
+		$fields->addFieldToTab('Root.Main', new RuleEditField('EditEncodedCondition', 'Conditions', $this->EncodedCondition));
+		$fields->addFieldToTab('Root.Main', new HiddenField('EncodedCondition', 'EncodedCondition', $this->EncodedCondition));
 		return $fields;
 	}
 
@@ -37,11 +43,13 @@ class BasicPersonalisationRule extends DataObject {
 				'ParamTwo' => $rule->param2->value
 			)));
 		}
-
-
-		return $this->customise(array(
+		
+		$html = $this->customise(array(
+				'Title' => $this->Title,
 				'Rules' => $rulesList
 		))->renderWith('GetCmsFieldRule');
+		$htmlContent = new SS_HTMLValue($html);
+		return $htmlContent;
 	}
 
 	/**
@@ -260,5 +268,49 @@ class BasicPersonalisationValue {
 		if (isset($array[$this->value])) return; // already set
 		$array[$this->value] = new ContextPropertyRequest(array("name" => $this->value));
 	}
+}
+
+class RuleEditField extends FormField {
+
+	public function __construct($name, $title = null, $value = null) {
+		$this->name = $name;
+		$this->title = ($title === null) ? $name : $title;
+
+		if($value !== NULL) $this->setValue(BasicPersonalisationRule::json_decode_typed($value));
+		// var_dump($this->value); die;
+		parent::__construct($name, $title = null, $value = null);
+	}
+
+	public function Field($properties = array()) {
+		
+		$rules = $this->value;
+		$rulesList = new ArrayList();
+
+		$operatorOptions = array(
+			BasicPersonalisationCondition::$op__equals => BasicPersonalisationCondition::$op__equals, 
+			BasicPersonalisationCondition::$op__notequals => BasicPersonalisationCondition::$op__notequals, 
+			BasicPersonalisationCondition::$op__contains => BasicPersonalisationCondition::$op__contains
+		);
+
+		$i = 1;
+		if($rules) foreach($rules as $rule) {
+			$rulesList->push(new ArrayData(array(
+				'Operator' => new DropdownField('Operator_'.$i, '', $operatorOptions, $rule->operator), 
+				'ParamOne' => new TextField('Param1_'.$i, '', $rule->param1->value),
+				'ParamTwo' => new TextField('Param2_'.$i, '', $rule->param2->value)
+			)));
+			$i++;
+		}
+		$defaultCheckbox = new CheckboxField('DefaultOption', '');
+		$html = $this->customise(array(
+				'Title' => $this->Title,
+				'Rules' => $rulesList,
+				'DefaultOpt' => $defaultCheckbox
+		))->renderWith('EditCMSFieldRule');
+		$htmlContent = new SS_HTMLValue($html);
+
+		return $htmlContent;
+	}
+
 }
 

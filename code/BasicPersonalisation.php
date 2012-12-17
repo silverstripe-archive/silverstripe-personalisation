@@ -7,6 +7,8 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 	);
 
 	function getCMSFields() {
+		Requirements::css('personalisation/css/personalisationAdmin.css');
+		Requirements::javascript('personalisation/javascript/personalisationAdmin.js');
 		$fields = parent::getCMSFields();
 
 		$fields->removeByName('Rules');

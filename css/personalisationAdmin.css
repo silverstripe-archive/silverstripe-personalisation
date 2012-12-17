@@ -1,0 +1,25 @@
+.col-NiceDecodedCondition {
+	font-size: 16px;
+}
+	.col-NiceDecodedCondition p {
+		margin: 16px 0;
+	}
+
+.rule-operator {
+	border: 1px solid #ccc;
+	padding: 4px 8px;
+	background-color: #9FB0BB;
+	color: #FFF;
+	margin-top: 10px;
+}
+
+.rule-param1, .rule-param2 {
+	border: 1px solid #ccc;
+	padding: 4px 8px;
+	margin-top: 10px;
+}
+
+.field input.text, .field select.dropdown {
+	width: 200px;
+	margin: 0 6px;
+}

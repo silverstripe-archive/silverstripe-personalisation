@@ -3,18 +3,16 @@
 interface TrackingIdentityFinder {
 
 	/**
-	 * Find the identity give the request as a context.
+	 * Find the identity given the request as a context. If the identity can't be found but there is enough
+	 * context to create it, do so.
 	 * @abstract
 	 * @return TrackingIdentity		Returns null if identity could not be established
 	 */
-	function find();
+	function findOrCreate();
 
 	/**
-	 * If no finder can determine the identity, a new identity is created. Each finder is then given the
-	 * opportunity to associate the state it uses for tracking with the new identity.
-	 * @abstract
-	 * @param TrackingIdentity $ident
-	 * @return void
+	 * Return an identifier for this type of identity. This could use class name, but generally we want something
+	 * shorter. This value is sent to tracking stores.
 	 */
-	function onCreate(TrackingIdentity $ident);
+	function getType();
 }

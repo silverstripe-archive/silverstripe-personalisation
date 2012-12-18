@@ -2,25 +2,24 @@
 
 class MemberTrackingIdentityFinder implements TrackingIdentityFinder {
 
-	function find() {
+	/**
+	 * Member tracking will create an identity if the user is logged in only. If logged out, returns null.
+	 * @return null
+	 */
+	function findOrCreate() {
 		$user = Member::currentUser();
 		if (!$user) return null;   // not logged in, so we can't find anything.
 
 		// if we can find a tracking identity that has already been associated with this user,
 		// then we return it. Otherwise we don't know.
-		$ident = TrackingIdentity::get()
-			->filter("MemberID", $user->ID)
-			->First();
+		$ident = TrackingIdentity::get_identity($this->getType(), $user->ID);
+		if (!$ident)
+			$ident = TrackingIdentity::create_identity($this->getType(), $user->ID);
 
 		return $ident;
 	}
 
-	function onCreate(TrackingIdentity $ident) {
-		$user = Member::currentUser();
-		if (!$user) return;   // not logged in, so we can't associate.
-
-		$ident->MemberID = $user->ID;
-		$ident->write();
+	function getType() {
+		return "member";
 	}
-
 }

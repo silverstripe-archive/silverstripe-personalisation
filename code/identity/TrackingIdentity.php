@@ -1,27 +1,58 @@
 <?php
 
 /**
- * This represents the identity of a user, to which we can attach whatever we know about that person.
- * Assumptions about identity:
- * - over time, multiple tracking identities may exist for the same person. e.g. accessing a site in non-logged in state
- *   from different devices.
- * - at points in time, such as if a user logs in, we may recognise that two identities are the same, in which case
- *   we can transfer what we know to one identity.
- * - Identities can have aliases, represented in TrackingIdentityAlias.
+ * This represents an identity. This effectively maps (IdentityDomain, IdentityValue) => ID, and is used by
+ * identity finders to isolate the physical tracking values (member ID, tracking cookie value) from the tracker,
+ * which just sees the integer ID values.
+ * Note that a site user may have more than one of these objects,. e.g. one for Member if they log on, one for tracking
+ * cookie. These are not merged at this level, and are not understood to be equivalent here. The equivalence is
+ * represented in tracking stores.
  */
 class TrackingIdentity extends DataObject {
 
 	static $db = array(
+		// An identifier of the domain of the identity, which is typically an external system that generated the
+		// identity value (e.g. perhaps a google tracking ID, if we know it), but can be the SilverStripe instance
+		// itself. Logically this is an enum, but we don't know values ahead of time. The values come from getType on
+		// the TrackingIdentityFinder instances.
+		"IdentityDomain" => "Varchar(50)",
+		"IdentityValue" => "Varchar(255)"
 	);
 
-	static $has_one = array(
-		"Member" => "Member"
-	);
+	function getType() {
+		return $this->IdentityDomain;
+	}
 
-	static $has_many = array(
-		"Aliases" => "TrackingIdentityAlias"
-	);
+	function getIdentifier() {
+		return $this->ID;
+	}
 
-	// @todo method to clear out old identities that have not been used, except where the member is known,
-	// @todo      and might only be to purge certain identities.
+	/**
+	 * Get an identity. Return null if there is no match.
+	 * @static
+	 * @param $domain
+	 * @param $id
+	 * @return
+	 */
+	static function get_identity($domain, $id) {
+		return TrackingIdentity::get()
+			->filter("IdentityDomain", $domain)
+			->filter("IdentityValue", $id)
+			->First();
+	}
+
+	/**
+	 * Create an identity and return it.
+	 * @static
+	 * @param $domain
+	 * @param $id
+	 * @return void
+	 */
+	static function create_identity($domain, $id) {
+		$item = new TrackingIdentity();
+		$item->IdentityDomain = $domain;
+		$item->IdentityValue = $id;
+		$item->write();
+		return $item;
+	}
 }

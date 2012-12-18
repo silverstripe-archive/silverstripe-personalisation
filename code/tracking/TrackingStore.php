@@ -85,7 +85,7 @@ interface TrackingStore {
 	 * 								with default parameters.
 	 * @return map
 	 */
-	function getProperties(TrackingIdentity $id, $names);
+	function getProperties(array $identities, $names);
 
 	/**
 	 * @abstract
@@ -93,13 +93,5 @@ interface TrackingStore {
 	 * @param $properties				Map of property names and values to store for the given identity
 	 * @return void
 	 */
-	function setProperties(TrackingIdentity $id, $properties);
-
-	/**
-	 * Merge multiple identities. A one or more identities are merged with a nominated master identity.
-	 * @abstract
-	 * @param TrackingIdentity $masterIdentity
-	 * @param array   array of TrackingIdentity objects to merge with the master identity.
-	 */
-	function mergeIdentities($masterIdentity, $mergeIdentities);
+	function setProperties(array $identities, $properties);
 }

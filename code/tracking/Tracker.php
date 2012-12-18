@@ -76,64 +76,82 @@ class Tracker {
 	}
 
 	/**
-	 * Get the TrackingIdentity for this request. This works by iterating over all the identity finders in
-	 * order to get the known identities. If more than one identity is returned, then they are assumed to be
-	 * the same identity, and we tell the tracking stores this new matching.
+	 * Return a map of type => ID from the identity finders. Each finder is given the opportunity to tell us what it
+	 * thinks is the identity of
 	 * @static
 	 * @return void
 	 */
-	static function find_identity() {
+	static function find_identities() {
 		if (!self::$identity_cache) {
 			$identities = array();
 			foreach (self::$finders as $name => $finder) {
-				$identity = $finder->find();
-				if ($identity) $identities[$name] = $identity;  // record all the identities we find, associated to the finder name
+				$identity = $finder->findOrCreate();
+				if ($identity) $identities[$identity->getType()] = $identity->getIdentifier();  // record all the identities we find, associated to the finder's type
 			}
-
-			switch (count($identities)) {
-				case 0:
-					// no identities were found
-					$identity = new TrackingIdentity();
-					$identity->write();
-
-					foreach (self::$finders as $finder) {
-						$finder->onCreate($identity);
-					}
-
-					self::$identity_cache = $identity;
-					break;
-
-				case 1:
-					// we found exactly one identity, so use it
-					reset($identities);
-					$k = key($identities);
-					self::$identity_cache = $identities[$k];
-					break;
-
-				default:
-					// we found multiple identities, so we need to merge them. We keep the top-most identity,
-					// as the first identity finder is assumed to be the most specific and reliable.
-					// We need to tell each tracking store of this change.
-					$masterIdentity = null;
-					$mergeIdentities = array();
-					foreach ($identities as $name => $identity) {
-						if (!$masterIdentity)
-							$masterIdentity = $identity;
-						else
-							$mergeIdentities[] = $identity;
-					}
-
-					foreach (self::$tracking_stores as $name => $def) {
-						$storeInst = self::get_store_inst($name);
-						$storeInst->mergeIdentities($masterIdentity, $mergeIdentities);
-					}
-
-					break;
-			}
+			self::$identity_cache = $identities;
 		}
 		return self::$identity_cache;
 	}
 
+//	/**
+//	 * Get the TrackingIdentity for this request. This works by iterating over all the identity finders in
+//	 * order to get the known identities. If more than one identity is returned, then they are assumed to be
+//	 * the same identity, and we tell the tracking stores this new matching.
+//	 * @static
+//	 * @return void
+//	 */
+//	static function find_identity() {
+//		if (!self::$identity_cache) {
+//			$identities = array();
+//			foreach (self::$finders as $name => $finder) {
+//				$identity = $finder->find();
+//				if ($identity) $identities[$name] = $identity;  // record all the identities we find, associated to the finder name
+//			}
+//
+//			switch (count($identities)) {
+//				case 0:
+//					// no identities were found
+//					$identity = new TrackingIdentity();
+//					$identity->write();
+//
+//					foreach (self::$finders as $finder) {
+//						$finder->onCreate($identity);
+//					}
+//
+//					self::$identity_cache = $identity;
+//					break;
+//
+//				case 1:
+//					// we found exactly one identity, so use it
+//					reset($identities);
+//					$k = key($identities);
+//					self::$identity_cache = $identities[$k];
+//					break;
+//
+//				default:
+//					// we found multiple identities, so we need to merge them. We keep the top-most identity,
+//					// as the first identity finder is assumed to be the most specific and reliable.
+//					// We need to tell each tracking store of this change.
+//					$masterIdentity = null;
+//					$mergeIdentities = array();
+//					foreach ($identities as $name => $identity) {
+//						if (!$masterIdentity)
+//							$masterIdentity = $identity;
+//						else
+//							$mergeIdentities[] = $identity;
+//					}
+//
+//					foreach (self::$tracking_stores as $name => $def) {
+//						$storeInst = self::get_store_inst($name);
+//						$storeInst->mergeIdentities($masterIdentity, $mergeIdentities);
+//					}
+//
+//					break;
+//			}
+//		}
+//		return self::$identity_cache;
+//	}
+//
 	/**
 	 * Track some properties. This adds the properties to a store.
 	 * @static
@@ -155,8 +173,7 @@ class Tracker {
 		}
 
 		$inst = self::get_store_inst($storeName);
-		$trackingId = self::find_identity();
-		$inst->setProperties($trackingId, $properties);
+		$inst->setProperties(self::find_identities(), $properties);
 	}
 
 	/**
@@ -191,14 +208,14 @@ class Tracker {
 	static function get_properties($properties, $store = null, $notFoundNulled = false) {
 		if (!is_array($properties)) $properties = array($properties);
 
-		$trackingId = self::find_identity();
+		$identities = self::find_identities();
 
 		$result = array();
 		foreach (self::$tracking_stores as $name => $def) {
 			if ($store && $store != $name) continue;
 
 			$storeInst = self::get_store_inst($name);
-			$r = $storeInst->getProperties($trackingId, $properties);
+			$r = $storeInst->getProperties($identities, $properties);
 			$result = array_merge($result, $r);
 		}
 

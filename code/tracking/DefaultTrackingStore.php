@@ -6,19 +6,23 @@ class DefaultTrackingStore implements TrackingStore {
 		// nothing to do.
 	}
 
-	function getProperties(TrackingIdentity $id, $properties) {
-        if (!is_numeric($id)) return array(); // do nothing if the identity is not provided
-
+	function getProperties(array $identities, $properties) {
 		if (!is_array($properties)) $properties = array($properties);
+
+		$ids = DefaultTrackingStoreIdentity::find_identities($identities);
+
+		// if we haven't seen these ID's before, we'll have no data.
+		if (!$ids || count($ids) == 0) return array();
 
 		$result = array();
 		foreach ($properties as $property) {
+			// get the tracking store item by name and any of the identities
 			$items = DefaultTrackingStoreItem::get()
-				->filter("TrackingIdentityID", $id->ID)
+				->innerJoin("DefaultTrackingStoreItem_Identities", "\"DefaultTrackingStoreItem\".\"ID\"=\"DefaultTrackingStoreItem_Identities\".\"DefaultTrackingStoreItemID\"")
 				->where("\"Key\" = '" . $property->getName() . "'")
+				->where("\"DefaultTrackingStoreItem_Identities\".\"DefaultTrackingStoreIdentityID\" in (" . implode($ids, ",") . ")")
 				->sort("\"LastEdited\" desc")
 				->limit($property->getMaxRequested());
-
 			$values = array();
 			foreach ($items as $item) {
 				$values[] = new ContextProperty(array(
@@ -27,42 +31,44 @@ class DefaultTrackingStore implements TrackingStore {
 					"confidence" => 100,  // we're completely sure of the request. @todo pull from db record
 					"timestamp" => $item->LastEdited
 				));
-
 			}
-			$result[$property->getName()] = $values;
+			if (count($values) > 0)
+				$result[$property->getName()] = $values;
 		}
 
 		return $result;
 	}
 
-	function setProperties(TrackingIdentity $id, $properties) {
-        if (!is_numeric($id)) return; // do nothing if the identity is not provided
+	function setProperties(array $identities, $properties) {
+        if (!is_array($identities)) return; // do nothing if the identity is not provided
+		if (!is_array($properties)) return; // do nothing if there is nothing to set
+
+		// Get the internal identity IDs for the requested entities, and get full objects not just IDs.
+		$ids = DefaultTrackingStoreIdentity::find_identities($identities, true, false);
+
 		foreach ($properties as $key => $value) {
-			$item = DefaultTrackingStoreItem::get()
-				->filter("Key", $key)
-				->filter("TrackingIdentityID", $id->ID)
-				->First();
-			if (!$item) {
-				$item = new DefaultTrackingStoreItem();
-				$item->Key = $key;
-				$item->TrackingIdentityID = $id->ID;
-			}
+			// Get this property where there is at least one of the identities that match.
+//			$item = DefaultTrackingStoreItem::get()
+//				->filter("Key", $key)
+//				->First();
+//			if (!$item) {
+//				$item = new DefaultTrackingStoreItem();
+//				$item->Key = $key;
+//				$item->TrackingIdentityID = $id->ID;
+//			}
+			// We always create the tracking record. This means potentially alot of data.
+			// @todo implement a way to set properties and provide a limit, like VMS used to do.
+			$item = new DefaultTrackingStoreItem();
+			$item->Key = $key;
 			$item->Value = self::json_encode_typed($value);
 			$item->write();
-		}
-	}
 
-	/**
-	 * When we're asked to merge identities, we update all store items for the mergeIdentities
-	 * to use the new master identity.
-	 */
-	function mergeIdentities($masterIdentity, $mergeIdentities) {
-//		$a = array();
-//		foreach ($mergeIdentities as $i) $a[] = $i->ID;
-//		$sql = "update \"DefaultTrackingStoreItem\" set \"TrackingIdentifierID\"=" .
-//					$masterIdentity->ID .
-//					" where TrackingIdentifierID in (" . implode(",", $a);
-//		DB::query($sql);
+			// set the identities
+			foreach ($ids as $id) {
+				$item->Identities()->add($id);
+			}
+			$item->write();
+		}
 	}
 
 	static function _escape($s) {

@@ -12,18 +12,12 @@ class CookieTrackingIdentityFinder implements TrackingIdentityFinder {
 		return self::$cookie_name;
 	}
 
-	function find() {
-		if (!isset($_COOKIE[self::$cookie_name])) return null;
-
-		// See if there is an alias in the cookie domain for this session ID
-		$ident = TrackingIdentityAlias::get()
-			->filter("IdentityDomain", TrackingIdentityAlias::$id_domain__cookie)
-			->filter("IdentityValue", $_COOKIE[self::$cookie_name])
-			->First();
-		return $ident;
-	}
-
-	function onCreate(TrackingIdentity $ident) {
+	/**
+	 * The cookie tracker will always create an identity. If one doesn't exist, it creates the cookie and returns
+	 * a new ID for it.
+	 * @return null|void
+	 */
+	function findOrCreate() {
 		if (isset($_COOKIE[self::$cookie_name])) {
 			$value = $_COOKIE[self::$cookie_name];
 		}
@@ -35,17 +29,20 @@ class CookieTrackingIdentityFinder implements TrackingIdentityFinder {
 			}
 		}
 
-		// Create an alias against the identity in the session domain with current session ID.
-		$alias = new TrackingIdentityAlias();
-		$alias->IdentityDomain = TrackingIdentityAlias::$id_domain__cookie;
-		$alias->IdentityValue = $value;
-		$alias->TrackingIdentityID = $ident->ID;
-		$alias->write();
+		$ident = TrackingIdentity::get_identity($this->getType(), $value);
+		if (!$ident)
+			$ident = TrackingIdentity::create_identity($this->getType(), $value);
+
+		return $ident;
 	}
 
 	function generateCookieValue() {
 		$generator = new RandomGenerator();
 		return $generator->generateHash('sha1');
 
+	}
+
+	function getType() {
+		return "cookie";
 	}
 }

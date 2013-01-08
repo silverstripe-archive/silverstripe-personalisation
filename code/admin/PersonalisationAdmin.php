@@ -36,8 +36,11 @@ class PersonalisationAdmin extends ModelAdmin {
 	public function getEditForm($id = null, $fields = null) {
 		$tempList = PersonalisationScheme::get();
 		$list = new ArrayList();
-		if($tempList) foreach($tempList as $e) {
+
+		if($tempList->Count() != 0) foreach($tempList as $e) {
 			$list->push($e);
+		} else {
+			$list = new DataList('BasicPersonalisation');
 		}
 		
 		$listField = GridField::create(

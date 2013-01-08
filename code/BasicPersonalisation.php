@@ -43,7 +43,7 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 	function generateRuleHTML($rules) {
 
 		$rulesList = new ArrayList();
-		foreach($rules as $rule) {
+		if($rules) foreach($rules as $rule) {
 			
 			$rulesList->push(new ArrayData(array(
 				'Operator' => $rule->operator, 

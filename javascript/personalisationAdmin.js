@@ -72,13 +72,18 @@
 
 		$('.add-rule').entwine({
 			onclick: function() {
-				$('.rule-line:last').clone().appendTo('#EditEncodedCondition .middleColumn');
-				$('.rule-line:last').find('input').each( function() {
-					$(this).val('');
-				});
-				$('.rule-line:last').find('select').each( function() {
-					$(this).val('eq');
-				});
+				if($('.rule-line').length) {
+					$('.rule-line:last').clone().appendTo('#EditEncodedCondition .middleColumn');
+					$('.rule-line:last').find('input').each( function() {
+						$(this).val('');
+					});
+					$('.rule-line:last').find('select').each( function() {
+						$(this).val('eq');
+					});
+				} else {
+					$('<p class="rule-line"><span><input id="Param1_1" class="text nolabel" type="text" value="" name="Param1_1"></span><span><select id="Operator_1" class="dropdown nolabel" name="Operator_1"><option selected="" value="eq">eq</option><option value="ne">ne</option><option value="contains">contains</option></select></span><span><input type="text" id="Param2_1" class="text nolabel" value="" name="Param2_1"></span><span class="rulesActions"><a class="remove-rule" href="#">[x]</a></span></p>').appendTo('#EditEncodedCondition .middleColumn');
+				}
+				
 				this.updateState();
 				$('.remove-rule').rearrangeRules();
 				return false;

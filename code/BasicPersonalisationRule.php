@@ -277,13 +277,12 @@ class RuleEditField extends FormField {
 		$this->title = ($title === null) ? $name : $title;
 
 		if($value !== NULL) $this->setValue(BasicPersonalisationRule::json_decode_typed($value));
-		// var_dump($this->value); die;
 		parent::__construct($name, $title = null, $value = null);
 	}
 
 	public function Field($properties = array()) {
 		
-		$rules = $this->value;
+		$rules = ($this->Value()) ? $this->Value() : $this->getValue();
 		$rulesList = new ArrayList();
 
 		$operatorOptions = array(
@@ -308,8 +307,12 @@ class RuleEditField extends FormField {
 				'DefaultOpt' => $defaultCheckbox
 		))->renderWith('EditCMSFieldRule');
 		$htmlContent = new SS_HTMLValue($html);
-
+		
 		return $htmlContent;
+	}
+
+	function getValue() {
+		return  BasicPersonalisationRule::json_decode_typed($this->getForm()->getRecord()->EncodedCondition);
 	}
 
 }

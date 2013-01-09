@@ -36,7 +36,11 @@
 		$('.remove-rule').entwine({
 			onclick: function() {
 				var self = this;
-				this.parents('p').fadeOut('slow', function() { $(this).remove(); self.rearrangeRules(); $('.add-rule').updateState(); });
+				this.parents('p').fadeOut('slow', function() { 
+					$(this).remove(); 
+					self.rearrangeRules(); 
+					$('.add-rule').updateState(); 
+				});
 				return false;
 			},
 			rearrangeRules: function() {
@@ -118,7 +122,6 @@
 				var resp = '[';
 				var i = 1;
 				form.find('.rule-line').each( function() {
-					console.log($(this).find('#Param2_'+i));
 					resp += '{"_className":"BasicPersonalisationCondition","operator":"' + $(this).find('#Operator_'+i).val() + '",';
 					resp += '"param1":{"_className":"BasicPersonalisationValue","kind":"P","value":"' + $(this).find('#Param1_'+i).val() + '"},';
 					resp += '"param2":{"_className":"BasicPersonalisationValue","kind":"L","value":"' + $(this).find('#Param2_'+i).val() + '"}},';
@@ -127,7 +130,6 @@
 				resp = resp.substring(0, resp.length - 1);
 				resp += ']';
 				form.find('input[name=EncodedCondition]').val(resp);
-
 			}
 		});
 	});

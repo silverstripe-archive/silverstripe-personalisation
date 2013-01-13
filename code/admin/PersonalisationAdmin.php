@@ -9,7 +9,6 @@ class PersonalisationAdmin extends ModelAdmin {
 	public static $managed_models = array('BasicPersonalisation');
 
 	public static function managed_personalisation_models() {
-
 		$classes = array();
 		foreach(ClassInfo::subclassesFor('PersonalisationScheme') as $i => $class) {
 			if($class == 'PersonalisationScheme') continue;
@@ -19,6 +18,19 @@ class PersonalisationAdmin extends ModelAdmin {
 			$classes[] = $class;
 		}
 		
+		return $classes;
+	}
+
+	public static function managed_variation_models(){
+		$classes = array();
+		foreach(ClassInfo::subclassesFor('PersonalisationVariation') as $i => $class){
+			if($class == 'PersonalisationVariation') continue;
+
+			if(ClassInfo::classImplements($class, 'TestOnly')) continue;
+
+			//if(singleton($class)->canCreate()) $classes[] = $class;
+			$classes[] = $class;
+		}
 		return $classes;
 	}
 

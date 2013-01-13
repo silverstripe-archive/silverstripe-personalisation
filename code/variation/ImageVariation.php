@@ -2,6 +2,10 @@
 
 class ImageVariation extends PersonalisationVariation {
 
+	static $db = array(
+		"VariationURL" => "Text"
+	);
+
 	static $has_one = array(
 		"Image" => "Image"
 	);
@@ -9,4 +13,31 @@ class ImageVariation extends PersonalisationVariation {
 	function render(ContextProvider $context) {
 		return $this->Image();
 	}
+
+	static function addExtraFields(){
+		$fields = new FieldList();
+		$url = new TextField("VariationURL", "URL");
+		$fields->push($url);
+		$imageField = new UploadField("ImageID", "Image");
+		$imageField->getValidator()->setAllowedExtensions(array('jpg', 'gif', 'png'));
+		$fields->push($imageField);
+		return $fields;
+	}
+
+	/**
+	 *
+	 * @return null|string
+	 */
+	function getURL(){
+		if($this->VariationURL){
+			$url = $this->VariationURL;
+			if (!preg_match("~^(?:f|ht)tps?://~i", $url)) {
+				$url = "http://" . $url;
+			}
+			return $url;
+		}
+	}
 }
+
+
+

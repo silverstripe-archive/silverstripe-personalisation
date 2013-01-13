@@ -13,6 +13,29 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 
 		$fields->removeByName('Rules');
 
+		$fields->removeByName('Variations');
+
+		$variationGridField = GridFieldConfig::create()->addComponents(
+			new GridFieldToolbarHeader(),
+			new GridFieldDataColumns(),
+			new GridFieldPaginator(15),
+			new GridFieldEditButton(),
+			new GridFieldDeleteAction(),
+			new GridFieldDetailForm()
+		);
+
+		$variations = PersonalisationAdmin::managed_variation_models();
+
+		foreach($variations as $v){
+			$button = new VariationGridFieldAddNewButton();
+			$button->setButtonName($v);
+			$variationGridField->addComponent($button);
+		}
+
+		$variationsField = new GridField('Variations', 'Variations', PersonalisationVariation::get(), $variationGridField);
+		$fields->addFieldToTab('Root.Variations', $variationsField);
+
+
 		$rules = $this->generateRulesList();
 		$gridFieldConfig = GridFieldConfig::create()->addComponents(
 			new GridFieldToolbarHeader(),
@@ -103,5 +126,26 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 		return true;
 	}
 
+}
+
+class VariationGridFieldAddNewButton extends GridFieldAddNewButton {
+
+	public function getHTMLFragments($gridField){
+		if(!$this->buttonName) {
+			// provide a default button name, can be changed by calling {@link setButtonName()} on this component
+			$objectName = singleton($gridField->getModelClass())->i18n_singular_name();
+			$this->buttonName = _t('GridField.Add', 'Add {name}', array('name' => $objectName));
+		}
+
+		$data = new ArrayData(array(
+			'NewLink' => Controller::join_links($gridField->Link('item', $gridField), 'new') . "?sc=" . $this->buttonName,
+			'ButtonName' => preg_replace('/(?!^)[[:upper:]]+/',' \0', $this->buttonName)
+		));
+
+		return array(
+			$this->targetFragment => $data->renderWith('GridFieldAddNewbutton'),
+		);
+
+	}
 }
 

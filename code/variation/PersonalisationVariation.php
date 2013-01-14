@@ -11,6 +11,17 @@ class PersonalisationVariation extends DataObject {
 		"Parent" => "VaryingPersonalisationScheme"
 	);
 
+	static $summary_fields = array(
+		"Name",
+		"Description",
+		"NiceClassName"
+	);
+
+	function NiceClassName(){
+		$cn = preg_replace('/(?!^)[[:upper:]]+/',' \0', $this->ClassName);
+		return $cn;
+	}
+
 	function render(ContextProvider $context) {
 		// should be overridden by subclasses.
 	}
@@ -26,6 +37,9 @@ class PersonalisationVariation extends DataObject {
 				$extraFields = $subclass::addExtraFields();
 				$fields->merge($extraFields);
 			}
+		}else{
+			$className = preg_replace('/(?!^)[[:upper:]]+/',' \0',$this->ClassName);
+			$fields->addFieldToTab("Root.Main", new ReadonlyField("Class", "Variation Type", $className), "Name");
 		}
 		return $fields;
 	}

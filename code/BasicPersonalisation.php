@@ -139,7 +139,7 @@ class VariationGridFieldAddNewButton extends GridFieldAddNewButton {
 
 		$data = new ArrayData(array(
 			'NewLink' => Controller::join_links($gridField->Link('item', $gridField), 'new') . "?sc=" . $this->buttonName,
-			'ButtonName' => preg_replace('/(?!^)[[:upper:]]+/',' \0', $this->buttonName)
+			'ButtonName' => "Add " . preg_replace('/(?!^)[[:upper:]]+/',' \0', $this->buttonName)
 		));
 
 		return array(

@@ -32,9 +32,8 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 			$variationGridField->addComponent($button);
 		}
 
-		$variationsField = new GridField('Variations', 'Variations', PersonalisationVariation::get(), $variationGridField);
+		$variationsField = new GridField('Variations', 'Variations', PersonalisationVariation::get()->filter(array("ParentID" => $this->ID)), $variationGridField);
 		$fields->addFieldToTab('Root.Variations', $variationsField);
-
 
 		$rules = $this->generateRulesList();
 		$gridFieldConfig = GridFieldConfig::create()->addComponents(

@@ -132,6 +132,13 @@
 				form.find('input[name=EncodedCondition]').val(resp);
 			}
 		});
+
+		//remove any empty values from drop down.
+		$("#Form_ItemEditForm_ParentID").entwine({
+			onmatch: function(){
+				$("#Form_ItemEditForm_ParentID option[value='']").remove();
+			}
+		});
 	});
 
 })(jQuery);

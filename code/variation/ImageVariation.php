@@ -16,7 +16,7 @@ class ImageVariation extends PersonalisationVariation {
 
 	static function addExtraFields(){
 		$fields = new FieldList();
-		$url = new TextField("VariationURL", "URL");
+		$url = new TextField("VariationURL", "Variation URL");
 		$fields->push($url);
 		$imageField = new UploadField("ImageID", "Image");
 		$imageField->getValidator()->setAllowedExtensions(array('jpg', 'gif', 'png'));

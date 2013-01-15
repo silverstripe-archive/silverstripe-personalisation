@@ -44,11 +44,29 @@ class PersonalisationVariation extends DataObject {
 		return $fields;
 	}
 
-
+	//do some stuff to save subclass information
 	function onBeforeWrite(){
 		parent::onBeforeWrite();
-		if(isset($_REQUEST['SubClass'])){
-			$this->ClassName = $_REQUEST['SubClass'];
+		if(isset($_REQUEST['SubClass']) && ClassInfo::exists($_REQUEST['SubClass'])){
+			$this->setClassName($_REQUEST['SubClass']);
 		}
 	}
+
+
+	function onAfterWrite(){
+		parent::onAfterWrite();
+		if(isset($_REQUEST['SubClass']) && ClassInfo::exists($_REQUEST['SubClass']) && !isset($written)){
+			$subclass = $this->newClassInstance($_REQUEST['SubClass']);
+			foreach($subclass->db() as $k => $v){
+				if(isset($_REQUEST[$k])){
+					$subclass->$k = $_REQUEST[$k];
+				}
+			}
+			$written = $subclass->write();
+		}
+	}
+
+
 }
+
+

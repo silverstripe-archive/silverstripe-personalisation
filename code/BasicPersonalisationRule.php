@@ -21,7 +21,7 @@ class BasicPersonalisationRule extends DataObject {
 		$fields = parent::getCMSFields();
 		$fields->removeByName('EncodedCondition');
 		$fields->removeByName('ParentID');
-		$fields->removeByName('VariationID');
+		$fields->addFieldToTab('Root.Main', new DropdownField("VariationID", "Variation", PersonalisationVariation::get()->filter(array("ParentID" => $this->ParentID))->map("ID", "Name")));
 		$fields->addFieldToTab('Root.Main', new RuleEditField('EditEncodedCondition', 'Conditions', $this->EncodedCondition));
 		$fields->addFieldToTab('Root.Main', new HiddenField('EncodedCondition', 'EncodedCondition', $this->EncodedCondition));
 		return $fields;

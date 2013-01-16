@@ -35,12 +35,12 @@ class BasicPersonalisationRule extends DataObject {
 	function generateRuleHTML($rules) {
 
 		$rulesList = new ArrayList();
-		foreach($rules as $rule) {
+		if ($rules) foreach($rules as $rule) {
 			
 			$rulesList->push(new ArrayData(array(
 				'Operator' => $rule->operator, 
-				'ParamOne' => $rule->param1->value,
-				'ParamTwo' => $rule->param2->value
+				'ParamOne' => isset($rule->param1->value) ? $rule->param1->value : null,
+				'ParamTwo' => isset($rule->param2->value) ? $rule->param2->value : null
 			)));
 		}
 		

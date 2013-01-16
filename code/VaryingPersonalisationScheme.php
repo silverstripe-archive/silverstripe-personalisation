@@ -11,6 +11,14 @@ class VaryingPersonalisationScheme extends PersonalisationScheme {
 		"Variations" => "PersonalisationVariation"
 	);
 
+	function getCMSFields(){
+		$fields = parent::getCMSFields();
+		$fields->removeByName("ContextProviderClass");
+		$fields->removeByName("SelectionProviderClass");
+		return $fields;
+	}
+
+
 	function personalise() {
 		$cp = $this->getContextProvider();
 		$sp = $this->getSelectionProvider();

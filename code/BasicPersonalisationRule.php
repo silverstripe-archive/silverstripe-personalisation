@@ -273,10 +273,11 @@ class RuleEditField extends FormField {
 
 	public function __construct($name, $title = null, $value = null) {
 		$this->name = $name;
+
 		$this->title = ($title === null) ? $name : $title;
 
 		if($value !== NULL) $this->setValue(BasicPersonalisationRule::json_decode_typed($value));
-		parent::__construct($name, $title = null, $value = null);
+		parent::__construct($name, $this->title, $value = null);
 	}
 
 	public function Field($properties = array()) {

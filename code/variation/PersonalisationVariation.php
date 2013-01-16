@@ -28,12 +28,16 @@ class PersonalisationVariation extends DataObject {
 
 	function getCMSFields(){
 		$fields = parent::getCMSFields();
+		$fields->removeByName("ParentID");
+
 		if(isset($_REQUEST["sc"])){
 			$subclass = $_REQUEST["sc"];
 			if(ClassInfo::exists($subclass)){
 				$className = preg_replace('/(?!^)[[:upper:]]+/',' \0',$subclass);
 				$fields->addFieldToTab("Root.Main", new HiddenField("SubClass", "SubClass", $subclass));
+				if(isset($_REQUEST["id"])) $fields->addFieldToTab("Root.Main", new HiddenField("ParentID", "ParentID", $_REQUEST["id"]));
 				$fields->addFieldToTab("Root.Main", new ReadonlyField("Class", "Variation Type", $className), "Name");
+
 				$extraFields = $subclass::addExtraFields();
 				$fields->merge($extraFields);
 			}
@@ -44,14 +48,15 @@ class PersonalisationVariation extends DataObject {
 		return $fields;
 	}
 
+
 	//do some stuff to save subclass information
 	function onBeforeWrite(){
 		parent::onBeforeWrite();
+		if(isset($_REQUEST["ParentID"])) $this->ParentID = $_REQUEST["ParentID"];
 		if(isset($_REQUEST['SubClass']) && ClassInfo::exists($_REQUEST['SubClass'])){
 			$this->setClassName($_REQUEST['SubClass']);
 		}
 	}
-
 
 	function onAfterWrite(){
 		parent::onAfterWrite();
@@ -65,8 +70,6 @@ class PersonalisationVariation extends DataObject {
 			$written = $subclass->write();
 		}
 	}
-
-
 }
 
 

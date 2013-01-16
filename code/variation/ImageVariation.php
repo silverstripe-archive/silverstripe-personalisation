@@ -3,7 +3,7 @@
 class ImageVariation extends PersonalisationVariation {
 
 	static $db = array(
-		"VariationURL" => "Text"
+		"VariationURL" => "Varchar(255)"
 	);
 
 	static $has_one = array(

@@ -133,8 +133,10 @@ class VariationGridFieldAddNewButton extends GridFieldAddNewButton {
 			$this->buttonName = _t('GridField.Add', 'Add {name}', array('name' => $objectName));
 		}
 
+		$params = Controller::curr()->request->allParams();
+
 		$data = new ArrayData(array(
-			'NewLink' => Controller::join_links($gridField->Link('item', $gridField), 'new') . "?sc=" . $this->buttonName,
+			'NewLink' => Controller::join_links($gridField->Link('item', $gridField), 'new') . "?sc=" . $this->buttonName . "&id=" . $params["ID"],
 			'ButtonName' => "Add " . preg_replace('/(?!^)[[:upper:]]+/',' \0', $this->buttonName)
 		));
 

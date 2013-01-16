@@ -31,9 +31,8 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 
 	function generateRulesList() {
 		$rules = $this->Rules();
-
 		$html = 'RULE';
-		foreach($rules as $rule) {
+		if ($rules) foreach($rules as $rule) {
 			$html .= $this->generateRuleHTML(BasicPersonalisationRule::json_decode_typed($rule->EncodedCondition));
 			$html .= 'RULE';
 		}
@@ -41,21 +40,19 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 	}
 
 	function generateRuleHTML($rules) {
-
 		$rulesList = new ArrayList();
-		foreach($rules as $rule) {
-			
+		if ($rules) foreach($rules as $rule) {
 			$rulesList->push(new ArrayData(array(
 				'Operator' => $rule->operator, 
-				'ParamOne' => $rule->param1->value,
-				'ParamTwo' => $rule->param2->value
+				'ParamOne' => isset($rule->param1->value) ? $rule->param1->value : null,
+				'ParamTwo' => isset($rule->param2->value) ? $rule->param2->value : null
 			)));
 		}
 
-
-		return $this->customise(array(
+		$s = $this->customise(array(
 				'Rules' => $rulesList
 		))->renderWith('GetCmsFieldRule');
+		return $s;
 	}
 
 	/**

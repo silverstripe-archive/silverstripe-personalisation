@@ -36,7 +36,11 @@
 		$('.remove-rule').entwine({
 			onclick: function() {
 				var self = this;
-				this.parents('p').fadeOut('slow', function() { $(this).remove(); self.rearrangeRules(); $('.add-rule').updateState(); });
+				this.parents('p').fadeOut('slow', function() { 
+					$(this).remove(); 
+					self.rearrangeRules(); 
+					$('.add-rule').updateState(); 
+				});
 				return false;
 			},
 			rearrangeRules: function() {
@@ -72,13 +76,18 @@
 
 		$('.add-rule').entwine({
 			onclick: function() {
-				$('.rule-line:last').clone().appendTo('#EditEncodedCondition .middleColumn');
-				$('.rule-line:last').find('input').each( function() {
-					$(this).val('');
-				});
-				$('.rule-line:last').find('select').each( function() {
-					$(this).val('eq');
-				});
+				if($('.rule-line').length) {
+					$('.rule-line:last').clone().appendTo('#EditEncodedCondition .middleColumn');
+					$('.rule-line:last').find('input').each( function() {
+						$(this).val('');
+					});
+					$('.rule-line:last').find('select').each( function() {
+						$(this).val('eq');
+					});
+				} else {
+					$('<p class="rule-line"><span><input id="Param1_1" class="text nolabel" type="text" value="" name="Param1_1"></span><span><select id="Operator_1" class="dropdown nolabel" name="Operator_1"><option selected="" value="eq">eq</option><option value="ne">ne</option><option value="contains">contains</option></select></span><span><input type="text" id="Param2_1" class="text nolabel" value="" name="Param2_1"></span><span class="rulesActions"><a class="remove-rule" href="#">[x]</a></span></p>').appendTo('#EditEncodedCondition .middleColumn');
+				}
+				
 				this.updateState();
 				$('.remove-rule').rearrangeRules();
 				return false;
@@ -113,7 +122,6 @@
 				var resp = '[';
 				var i = 1;
 				form.find('.rule-line').each( function() {
-					console.log($(this).find('#Param2_'+i));
 					resp += '{"_className":"BasicPersonalisationCondition","operator":"' + $(this).find('#Operator_'+i).val() + '",';
 					resp += '"param1":{"_className":"BasicPersonalisationValue","kind":"P","value":"' + $(this).find('#Param1_'+i).val() + '"},';
 					resp += '"param2":{"_className":"BasicPersonalisationValue","kind":"L","value":"' + $(this).find('#Param2_'+i).val() + '"}},';
@@ -122,7 +130,13 @@
 				resp = resp.substring(0, resp.length - 1);
 				resp += ']';
 				form.find('input[name=EncodedCondition]').val(resp);
+			}
+		});
 
+		//remove any empty values from drop down.
+		$("#Form_ItemEditForm_ParentID").entwine({
+			onmatch: function(){
+				$("#Form_ItemEditForm_ParentID option[value='']").remove();
 			}
 		});
 	});

@@ -9,6 +9,13 @@ class TextVariation extends PersonalisationVariation {
 		"Text" => "HTMLText"
 	);
 
+	static function addExtraFields(){
+		$fields = new FieldList();
+		$text = new HtmlEditorField("Text", "Text Variation");
+		$fields->push($text);
+		return $fields;
+	}
+
 	function render(ContextProvider $context) {
 		$text = $this->Text;
 

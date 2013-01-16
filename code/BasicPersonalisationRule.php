@@ -21,7 +21,12 @@ class BasicPersonalisationRule extends DataObject {
 		$fields = parent::getCMSFields();
 		$fields->removeByName('EncodedCondition');
 		$fields->removeByName('ParentID');
-		$fields->addFieldToTab('Root.Main', new DropdownField("VariationID", "Variation", PersonalisationVariation::get()->filter(array("ParentID" => $this->ParentID))->map("ID", "Name")));
+		$fields->removeByName('VariationID');
+		if(!is_null($this->ParentID)){
+			$fields->addFieldToTab('Root.Main', new DropdownField("VariationID", "Variation", PersonalisationVariation::get()->filter(array("ParentID" => $this->ParentID))->map("ID", "Name"), null, "Select Variation"));
+		} else {
+			$fields->addFieldToTab('Root.Main', new ReadonlyField('', 'Variation', 'Variation relationship can be added after you have saved'));
+		}
 		$fields->addFieldToTab('Root.Main', new RuleEditField('EditEncodedCondition', 'Conditions', $this->EncodedCondition));
 		$fields->addFieldToTab('Root.Main', new HiddenField('EncodedCondition', 'EncodedCondition', $this->EncodedCondition));
 		return $fields;

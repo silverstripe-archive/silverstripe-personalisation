@@ -36,7 +36,6 @@ class PersonalisationAdmin extends ModelAdmin {
 
 
 	public function getList() {
-		
 		$context = $this->getSearchContext();
 		$params = $this->request->requestVar('q');
 		$list = $context->getResults($params);
@@ -49,17 +48,18 @@ class PersonalisationAdmin extends ModelAdmin {
 		$tempList = PersonalisationScheme::get();
 		$list = new ArrayList();
 
+		//Debug::show($tempList);die();
 		if($tempList->Count() != 0) foreach($tempList as $e) {
 			$list->push($e);
 		} else {
 			$list = new DataList('BasicPersonalisation');
 		}
-		
+
 		$listField = GridField::create(
 			$this->sanitiseClassName($this->modelClass),
 			false,
 			$list,
-			$fieldConfig =  GridFieldConfig_RecordEditor_Personalisation::create($this->stat('page_length'))
+			$fieldConfig = GridFieldConfig_RecordEditor_Personalisation::create($this->stat('page_length'))
 				->removeComponentsByType('GridFieldFilterHeader')
 		);
 
@@ -102,7 +102,7 @@ class GridFieldConfig_RecordEditor_Personalisation extends GridFieldConfig {
 		$this->addComponent($filter = new GridFieldFilterHeader());
 		$this->addComponent(new GridFieldDataColumns());
 		$this->addComponent(new GridFieldEditButton());
-		$this->addComponent(new GridFieldDeleteAction());
+		//$this->addComponent(new GridFieldDeleteAction());
 		$this->addComponent(new GridFieldPageCount('toolbar-header-right'));
 		$this->addComponent($pagination = new GridFieldPaginator($itemsPerPage));
 		$this->addComponent(new GridFieldDetailForm());

@@ -12,7 +12,6 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 		$fields = parent::getCMSFields();
 
 		$fields->removeByName('Rules');
-
 		$fields->removeByName('Variations');
 
 		$variationGridField = GridFieldConfig::create()->addComponents(
@@ -46,7 +45,16 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 			new GridFieldDetailForm()
 			
 		);
+
 		$rulesField = new GridField('DecodedRules', 'Rules', $this->Rules(), $gridFieldConfig);
+
+		// Validation
+		if(singleton('BasicPersonalisationRule')->hasMethod('getCMSValidator')) {
+			$detailValidator = singleton('BasicPersonalisationRule')->getCMSValidator();
+			$rulesField->getConfig()->getComponentByType('GridFieldDetailForm')->setValidator($detailValidator);
+		}
+
+
 		$fields->addFieldToTab('Root.Rules', $rulesField);
 		return $fields;
 	}

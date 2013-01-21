@@ -42,4 +42,40 @@ $idents = DefaultTrackingStoreIdentity::get()->toArray();
 		$this->assertEquals(count($props["a"]), 1);
 		$this->assertEquals($props["a"][0]->getValue(), "value a", "check props[a] is correct value");
 	}
+
+	function testMetadata() {
+		Tracker::init();
+
+		$propName = "tracker.test.metadata";
+		$propValue = "foo";
+
+		// Check that property doesn't exist.
+		$props = Tracker::get_properties(array(
+			new ContextPropertyRequest(array("name" => $propName))
+		));
+		$this->assertTrue(!isset($props[$propName]), "Check not found property");
+
+		// Save a value for the property.
+		Tracker::track(array(
+			$propName => $propValue
+		));
+
+		// Check the property has the value.
+		$props = Tracker::get_properties(array(
+			new ContextPropertyRequest(array("name" => $propName))
+		));
+		$this->assertTrue(isset($props[$propName]), "Check found property");
+		$this->assertEquals($props[$propName][0]->getValue(), $propValue);
+
+		// Check the metadata exists for the property.
+		$metadata = Tracker::get_metadata(array("*"));
+
+		$this->assertTrue(is_array($metadata), "Metadata is an array");
+
+		$this->assertTrue(isset($metadata["a"]), "'a' is present");
+		$this->assertTrue(is_object($metadata["a"]) && $metadata["a"] instanceof Text, "'a' is a text property");
+
+		$this->assertTrue(isset($metadata[$propName]), "'a' is present");
+		$this->assertTrue(is_object($metadata[$propName]) && $metadata[$propName] instanceof Text, "'$propName' is a text property");
+	}
 }

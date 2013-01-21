@@ -94,4 +94,13 @@ interface TrackingStore {
 	 * @return void
 	 */
 	function setProperties(array $identities, $properties);
+
+	/**
+	 * @abstract
+	 * Retrieve metadata that is held by a tracking store. $namespaces identifies what portion of the property
+	 * name space we're interested in ("*" is valid for all the name space). The result is compatible with
+	 * ContextProvider::getMetadata().  The intent is to allow the admin UI to discover what properties are present
+	 * for querying on. External accessors to a tracking store may define new properties that Tracker is not aware of.
+	 */
+	function getMetadata(array $namespaces);
 }

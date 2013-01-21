@@ -7,6 +7,7 @@ class DefaultTrackingStore implements TrackingStore {
 	}
 
 	function getProperties(array $identities, $properties) {
+//		echo "DefaultTrackingStore::getProperties:" . print_r($properties,true) . "\n";
 		if (!is_array($properties)) $properties = array($properties);
 
 		$ids = DefaultTrackingStoreIdentity::find_identities($identities);
@@ -16,10 +17,13 @@ class DefaultTrackingStore implements TrackingStore {
 
 		$result = array();
 		foreach ($properties as $property) {
+			$propID = $this->getPropertyID($property->getName());
+			if (!$propID) continue;
+
 			// get the tracking store item by name and any of the identities
 			$items = DefaultTrackingStoreItem::get()
 				->innerJoin("DefaultTrackingStoreItem_Identities", "\"DefaultTrackingStoreItem\".\"ID\"=\"DefaultTrackingStoreItem_Identities\".\"DefaultTrackingStoreItemID\"")
-				->where("\"Key\" = '" . $property->getName() . "'")
+				->where("\"PropertyID\" = " . $propID)
 				->where("\"DefaultTrackingStoreItem_Identities\".\"DefaultTrackingStoreIdentityID\" in (" . implode($ids, ",") . ")")
 				->sort("\"LastEdited\" desc")
 				->limit($property->getMaxRequested());
@@ -47,19 +51,12 @@ class DefaultTrackingStore implements TrackingStore {
 		$ids = DefaultTrackingStoreIdentity::find_identities($identities, true, false);
 
 		foreach ($properties as $key => $value) {
-			// Get this property where there is at least one of the identities that match.
-//			$item = DefaultTrackingStoreItem::get()
-//				->filter("Key", $key)
-//				->First();
-//			if (!$item) {
-//				$item = new DefaultTrackingStoreItem();
-//				$item->Key = $key;
-//				$item->TrackingIdentityID = $id->ID;
-//			}
+			$propID = $this->getPropertyID($key, true);
+
 			// We always create the tracking record. This means potentially alot of data.
 			// @todo implement a way to set properties and provide a limit, like VMS used to do.
 			$item = new DefaultTrackingStoreItem();
-			$item->Key = $key;
+			$item->PropertyID = $propID;
 			$item->Value = self::json_encode_typed($value);
 			$item->write();
 
@@ -69,6 +66,62 @@ class DefaultTrackingStore implements TrackingStore {
 			}
 			$item->write();
 		}
+	}
+
+	/**
+	 * Per-request cache of properties we've mapped from name to ID.
+	 * @var array
+	 */
+	static $property_ids = array();
+
+	/**
+	 * Given a property name, return the ID of the DefaultTrackingStoreProperty. This used in querying items,
+	 * which only store the IDs.
+	 * @param $propertyName
+	 * @return void
+	 */
+	function getPropertyID($propertyName, $createOnDemand = false) {
+		if (!isset(self::$property_ids[$propertyName])) {
+			// See if we have a definition for this property
+			$propID = DefaultTrackingStoreProperty::get_id_from_name($propertyName);
+			if (!$propID) {
+				if ($createOnDemand) {
+					$propID = DefaultTrackingStoreProperty::create_from_name($propertyName);
+				}
+				else
+					return null;  // We're not creating it, and it's not defined, so return nothing.
+			}
+			self::$property_ids[$propertyName] = $propID;
+		}
+		return self::$property_ids[$propertyName];
+	}
+
+	/**
+	 * Retrieve metadata for the specified namespace(s). Returns a map of property name to data type.
+	 * @param array $namespaces
+	 * @return array
+	 */
+	function getMetadata(array $namespaces) {
+		$result = array();
+
+		// Construct an order map of property name to data type.
+		$defined = DefaultTrackingStoreProperty::get()->map('PropertyName', 'DataType')->toArray();
+		ksort($defined);
+
+		foreach ($namespaces as $ns) {
+			// force match to full namespace components
+			if (substr($ns, -1) != ".") $ns .= ".";
+
+			foreach ($defined as $property => $def) {
+				if ($ns == "*." || substr($property, 0, strlen($ns)) == $ns) {
+					// this property matches up to the length of the name space
+					$inst = Object::create_from_string($def);
+					$result[$property] = $inst;
+				}
+			}
+		}
+
+		return $result;
 	}
 
 	static function _escape($s) {

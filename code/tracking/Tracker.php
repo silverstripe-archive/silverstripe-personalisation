@@ -243,4 +243,24 @@ class Tracker {
 		// @todo implement: need to know the URL of the controller that processes the tracking request. Is this
 		// @todo implement:    just a script?
 	}
+
+	/**
+	 * Get all properties that are known by the tracker. This iterates over the registered trackers, and asks eash in
+	 * turn for matching metadata properties, and merges the result. 
+	 * @static
+	 * @param $namespaces	This will be an array of name spaces. The namespaces can be wildcarded. To get all metadata,
+	 * 						it should be passed array("*")
+	 * @return void
+	 */
+	static function get_metadata($namespaces) {
+		$result = array();
+		foreach (self::$tracking_stores as $name => $def) {
+			$storeInst = self::get_store_inst($name);
+			$r = $storeInst->getMetadata($namespaces);
+			$result = array_merge($result, $r);
+		}
+
+		return $result;
+
+	}
 }

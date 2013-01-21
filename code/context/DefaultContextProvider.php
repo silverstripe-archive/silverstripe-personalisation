@@ -89,6 +89,9 @@ class DefaultContextProvider implements ContextProvider {
 	function getMetadata($namespaces = null) {
 		$result = array();
 
+		if (!$namespaces) $namespaces = "*";
+		if (!is_array($namespaces)) $namespaces = array($namespaces);
+
 		foreach ($this->handlers as $h) {
 			$result = array_merge($result, $h->getMetadata($namespaces));
 		}
@@ -193,8 +196,6 @@ class DefaultContextHandler implements ContextProvider {
 
 	function getMetadata($namespaces = null) {
 		$result = array();
-		if (!$namespaces) $namespaces = "*";
-		if (!is_array($namespaces)) $namespaces = array($namespaces);
 
 		foreach ($namespaces as $ns) {
 			// force match to full namespace components
@@ -219,7 +220,6 @@ class TrackerContextHandler implements ContextProvider {
 	}
 
 	function getMetadata($namespaces = null) {
-		// @todo implement TrackerContextHandler::getMetadata
-		return array();
+		return Tracker::get_metadata($namespaces);
 	}
 }

@@ -1,8 +1,33 @@
 <?php
-/**
- * Created by JetBrains PhpStorm.
- * User: pmeyrick
- * Date: 24/01/13
- * Time: 10:25 AM
- * To change this template use File | Settings | File Templates.
- */
+
+class TemplateVariation extends PersonalisationVariation{
+
+	static $db = array(
+		"TemplateName" => "Varchar"
+	);
+
+	static function addExtraFields(){
+		$fields = new FieldList();
+		$tempManifest = new SS_TemplateManifest(THEMES_PATH);
+		$templates = $tempManifest->getTemplates();
+		$tf = array();
+
+		foreach($templates as $k => $v){
+			if(isset($v['themes'])) array_push($tf, $k);
+		}
+
+		$templateField = new DropDownField("TemplateName", "Template Name", $tf);
+		$fields->push($templateField);
+		return $fields;
+	}
+
+	function render(ContextProvider $context, Controller $controller = null) {
+		$templateName = $this->TemplateName;
+
+		if(!is_null($controller) && SSViewer::hasTemplate(array($templateName))){
+			return $controller->renderWith(array($templateName));
+		}else{
+			return null;
+		}
+	}
+}

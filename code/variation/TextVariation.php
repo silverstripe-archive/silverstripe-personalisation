@@ -16,7 +16,7 @@ class TextVariation extends PersonalisationVariation {
 		return $fields;
 	}
 
-	function render(ContextProvider $context) {
+	function render(ContextProvider $context, Controller $controller = null) {
 		$text = $this->Text;
 
 		// substitute {{property}} references

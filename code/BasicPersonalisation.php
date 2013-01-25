@@ -118,12 +118,12 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 		return $var;
 	}
 
-	function personalise() {
+	function personalise(Controller $controller = null) {
 		$cp = $this->getContextProvider();
 
 		$var = $this->getVariation($cp, $this);
 
-		return $var->render();
+		return $var->render(null, $controller);
 	}
 
 	function canCreate($member = null) {

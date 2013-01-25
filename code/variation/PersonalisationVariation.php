@@ -22,7 +22,7 @@ class PersonalisationVariation extends DataObject {
 		return $cn;
 	}
 
-	function render(ContextProvider $context) {
+	function render(ContextProvider $context, Controller $controller = null) {
 		// should be overridden by subclasses.
 	}
 

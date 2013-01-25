@@ -19,7 +19,7 @@ class VaryingPersonalisationScheme extends PersonalisationScheme {
 	}
 
 
-	function personalise() {
+	function personalise(Controller $controller = null) {
 		$cp = $this->getContextProvider();
 		$sp = $this->getSelectionProvider();
 

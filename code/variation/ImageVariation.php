@@ -10,7 +10,7 @@ class ImageVariation extends PersonalisationVariation {
 		"Image" => "Image"
 	);
 
-	function render(ContextProvider $context) {
+	function render(ContextProvider $context, Controller $controller = null) {
 		return $this->Image();
 	}
 

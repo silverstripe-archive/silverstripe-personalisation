@@ -41,7 +41,7 @@ class TwitterFeedVariation extends PersonalisationVariation{
 						$date = $tweet->getField('pubDate');
 						$t = new DataObject();
 						$t->Headline = $this->twitifyText(str_replace($this->AccountName . ': ', '', $tweet->getField('description')));
-						$t->Date = date('c', strtotime($date));
+						$t->Date = date('d M Y', strtotime($date));
 						$t->Source = 'twitter';
 						$latestTweets->push($t);
 						$i++;

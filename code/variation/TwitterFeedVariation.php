@@ -1,8 +1,67 @@
 <?php
+
 /**
- * Created by JetBrains PhpStorm.
- * User: pmeyrick
- * Date: 28/01/13
- * Time: 4:42 PM
- * To change this template use File | Settings | File Templates.
+ * Really just developed as an example of what you can do with this module
  */
+class TwitterFeedVariation extends PersonalisationVariation{
+
+	static $db = array(
+		"AccountName" => "Varchar(255)",
+		"NoOfTweets" => "Int"
+	);
+
+	static function addExtraFields(){
+		$fields = new FieldList();
+		$acctName = new TextField("AccountName", "Account Name");
+		$fields->push($acctName);
+		return $fields;
+	}
+
+	function render(ContextProvider $context, Controller $controller = null) {
+		return $controller->customise(array("Tweets" => $this->getTweets()))->renderWith('TwitterFeedVariation');
+	}
+
+	/*
+	 * Retrieve the latest tweets
+	 */
+	function getTweets(){
+
+		if(!$this->AccountName) return null;
+
+		if($feed = new RestfulService('http://api.twitter.com/1/statuses/user_timeline.rss?screen_name=' . $this->AccountName )){
+			$feedXML = $feed->request()->getBody();
+
+			if($feedXML){
+				$latestTweets = new ArrayList();
+				$tweets = $feed->getValues($feedXML, 'channel', 'item');
+				//limit to 5
+				$i = 0;
+				foreach($tweets as $tweet){
+					if($i <= $this->NoOfTweets){
+						$date = $tweet->getField('pubDate');
+						$t = new DataObject();
+						$t->Headline = $this->twitifyText(str_replace($this->AccountName . ': ', '', $tweet->getField('description')));
+						$t->Date = date('c', strtotime($date));
+						$t->Source = 'twitter';
+						$latestTweets->push($t);
+						$i++;
+					}
+				}
+				return $latestTweets;
+			}else{
+				return null;
+			}
+		}
+	}
+
+	function twitifyText($headline){
+		$reg_exUrl = "/(http|https|ftp|ftps)\:\/\/[a-zA-Z0-9\-\.]+\.[a-zA-Z]{2,3}(\/\S*)?/";
+		if(preg_match($reg_exUrl, $headline, $url)) {
+			// make the urls hyper links
+			return preg_replace($reg_exUrl, "<a href=\"{$url[0]}\">{$url[0]}</a> ", $headline);
+		} else {
+			// if no urls in the text just return the text
+			return $headline;
+		}
+	}
+}

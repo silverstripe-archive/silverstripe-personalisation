@@ -5,7 +5,8 @@ class BasicPersonalisationRule extends DataObject {
 	static $db = array(
 		'Title' => 'Varchar(255)',
 		// json encoded object represents an array of BasicPersonalisationCondition objects.
-		"EncodedCondition" => "Text"
+		"EncodedCondition" => "Text",
+		"Priority" => 'Int'
 	);
 
 	static $has_one = array(
@@ -16,6 +17,8 @@ class BasicPersonalisationRule extends DataObject {
 	static $summary_fields = array(
 		'NiceDecodedCondition'
 	);
+
+	static $default_sort = '"Priority" ASC';
 
 	function getCMSFields() {
 		$fields = parent::getCMSFields();
@@ -289,7 +292,7 @@ class RuleEditField extends FormField {
 		
 		$rules = ($this->Value()) ? $this->Value() : $this->getValue();
 		$rulesList = new ArrayList();
-
+		$always = false;
 		$operatorOptions = array(
 			BasicPersonalisationCondition::$op__equals => BasicPersonalisationCondition::$op__equals, 
 			BasicPersonalisationCondition::$op__notequals => BasicPersonalisationCondition::$op__notequals, 
@@ -298,6 +301,10 @@ class RuleEditField extends FormField {
 
 		$i = 1;
 		if($rules) foreach($rules as $rule) {
+			if($rule->operator == BasicPersonalisationCondition::$op__always) { 
+				$always = true;
+				continue;
+			}
 			$rulesList->push(new ArrayData(array(
 				'Operator' => new DropdownField('Operator_'.$i, '', $operatorOptions, $rule->operator), 
 				'ParamOne' => new TextField('Param1_'.$i, '', $rule->param1->value),
@@ -305,11 +312,14 @@ class RuleEditField extends FormField {
 			)));
 			$i++;
 		}
-		$defaultCheckbox = new CheckboxField('DefaultOption', '');
+		
+		$defaultCheckbox = ($this->getForm()->getRecord()->Parent()->ID == 0 || $this->getForm()->getRecord()->Parent()->hasDefault()) ? null : new CheckboxField('DefaultOption', '', $always);
+		// var_dump($this->getForm()->getRecord()->Parent()->ID == 0 || $this->getForm()->getRecord()->Parent()->hasDefault()); die;
 		$html = $this->customise(array(
 				'Title' => $this->Title,
 				'Rules' => $rulesList,
-				'DefaultOpt' => $defaultCheckbox
+				'DefaultOpt' => $defaultCheckbox,
+				'showAddRulesLink' => (!$always)
 		))->renderWith('EditCMSFieldRule');
 		$htmlContent = new SS_HTMLValue($html);
 		

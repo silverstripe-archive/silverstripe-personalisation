@@ -119,16 +119,24 @@
 				return false;
 			},
 			convertToString: function(form) {
+				
 				var resp = '[';
-				var i = 1;
-				form.find('.rule-line').each( function() {
-					resp += '{"_className":"BasicPersonalisationCondition","operator":"' + $(this).find('#Operator_'+i).val() + '",';
-					resp += '"param1":{"_className":"BasicPersonalisationValue","kind":"P","value":"' + $(this).find('#Param1_'+i).val() + '"},';
-					resp += '"param2":{"_className":"BasicPersonalisationValue","kind":"L","value":"' + $(this).find('#Param2_'+i).val() + '"}},';
-					i++;
-				});
+				if(form.find('#DefaultOption').is(':checked') || $('#isDefaultAlready').length > 0) {
+					resp += '{"_className":"BasicPersonalisationCondition","operator":"always",';
+					resp += '"param1":{"_className":"BasicPersonalisationValue","kind":"P","value":""},';
+					resp += '"param2":{"_className":"BasicPersonalisationValue","kind":"L","value":""}},';
+				} else {
+					var i = 1;
+					form.find('.rule-line').each( function() {
+						resp += '{"_className":"BasicPersonalisationCondition","operator":"' + $(this).find('#Operator_'+i).val() + '",';
+						resp += '"param1":{"_className":"BasicPersonalisationValue","kind":"P","value":"' + $(this).find('#Param1_'+i).val() + '"},';
+						resp += '"param2":{"_className":"BasicPersonalisationValue","kind":"L","value":"' + $(this).find('#Param2_'+i).val() + '"}},';
+						i++;
+					});
+				}
 				resp = resp.substring(0, resp.length - 1);
 				resp += ']';
+				
 				form.find('input[name=EncodedCondition]').val(resp);
 			}
 		});

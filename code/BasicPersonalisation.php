@@ -130,6 +130,14 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 		return true;
 	}
 
+	function hasDefault() {
+		foreach($this->Rules() as $rule) {
+			$decodedRule = BasicPersonalisationRule::json_decode_typed($rule->EncodedCondition);
+			if(($decodedRule[0]) && ($decodedRule[0]->operator == BasicPersonalisationCondition::$op__always)) return true;
+		}
+		return false;
+	}
+
 }
 
 class VariationGridFieldAddNewButton extends GridFieldAddNewButton {

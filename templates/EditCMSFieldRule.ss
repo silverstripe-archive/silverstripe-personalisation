@@ -1,8 +1,10 @@
-<p> 
-	Default Option (always true) <span>$DefaultOpt</span>
-</p>
+<% if DefaultOpt %>
+	<p> 
+		Default Option (always true) <span>$DefaultOpt</span>
+	</p>
+<% end_if %>
 <p>
-	<a href="#" class="add-rule">Add rule</a>
+	<% if showAddRulesLink %><a href="#" class="add-rule">Add rule</a><% else %><span id="isDefaultAlready">This is the default rule</span><% end_if %>
 </p>
 <% loop Rules %>
 	<p class="rule-line">

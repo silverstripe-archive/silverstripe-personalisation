@@ -18,7 +18,7 @@ class BasicPersonalisationRule extends DataObject {
 		'NiceDecodedCondition'
 	);
 
-	static $default_sort = '"Priority" ASC';
+	// static $default_sort = '"Priority" ASC';
 
 	function getCMSFields() {
 		$fields = parent::getCMSFields();
@@ -174,6 +174,10 @@ class BasicPersonalisationRule extends DataObject {
 			return $a;
 		}
 		return $o;
+	}
+
+	function isDefault() {
+		return strpos($this->EncodedCondition, '"operator":"' . BasicPersonalisationCondition::$op__always . '"');
 	}
 }
 

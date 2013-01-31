@@ -60,13 +60,38 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 	}
 
 	function generateRulesList() {
-		$rules = $this->Rules();
+		$rules = $this->getRules();
+		
 		$html = 'RULE';
 		if ($rules) foreach($rules as $rule) {
 			$html .= $this->generateRuleHTML(BasicPersonalisationRule::json_decode_typed($rule->EncodedCondition));
 			$html .= 'RULE';
 		}
+		
 		return $html;
+	}
+
+	/**
+	 * this method sorts rules so Default will be always the last one to be displayed
+	**/
+	function getRules() {
+		$arrayRules = new ArrayList();
+		$sortedRules = new ArrayList();
+
+		if($rules = $this->Rules()) foreach($rules as $rule) {
+			$arrayRules->push($rule);
+		}
+		if($arrayRules) foreach($arrayRules as $rule) {
+			if($rule->isDefault() === false) {
+				$sortedRules->push($rule);
+				$arrayRules->remove($rule);
+			}
+		}
+		if($arrayRules->Count() > 0) {
+			$sortedRules->push($arrayRules->last());
+		}
+		
+		return $sortedRules;
 	}
 
 	function generateRuleHTML($rules) {

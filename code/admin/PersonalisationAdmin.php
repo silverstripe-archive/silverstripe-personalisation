@@ -34,13 +34,17 @@ class PersonalisationAdmin extends ModelAdmin {
 		return $classes;
 	}
 
-
+	/**
+	 * @todo Are we using this? get rid of it
+	**/
 	public function getList() {
+
 		$context = $this->getSearchContext();
 		$params = $this->request->requestVar('q');
 		$list = $context->getResults($params);
 		
 		$this->extend('updateList', $list);
+
 		return $list;
 	}
 
@@ -48,7 +52,7 @@ class PersonalisationAdmin extends ModelAdmin {
 		$tempList = PersonalisationScheme::get();
 		$list = new ArrayList();
 
-		//Debug::show($tempList);die();
+		
 		if($tempList->Count() != 0) foreach($tempList as $e) {
 			$list->push($e);
 		} else {

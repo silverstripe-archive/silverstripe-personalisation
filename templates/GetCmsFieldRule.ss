@@ -1,4 +1,4 @@
-<h3>$Title</h3>
+<h3 data-rule-id="$ID">$Title</h3>
 <h4>$Priority</h4>
 <% loop Rules %>
 	<p>

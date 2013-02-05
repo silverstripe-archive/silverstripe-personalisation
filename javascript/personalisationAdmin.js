@@ -147,6 +147,61 @@
 				$("#Form_ItemEditForm_ParentID option[value='']").remove();
 			}
 		});
+
+
+		$('.ss-gridfield-items').entwine({
+			onmatch: function() {
+				// find
+				var self = this;
+				this.sortable({
+					stop: function( event, ui ) {
+						
+						if(ui.item.find('.rule-operator').text() == 'always') {
+							alert('sorry but default is not sortable');
+							$(this).sortable( "cancel" );	
+						} else {
+							var defaultElementID = null;
+							var rulesIDs = '';
+							var priority = 1;
+							var lastID = null;
+							$('.ss-gridfield-items tr h3').each( function(){
+								if($(this).parents('tr').find('.rule-operator').text() == 'always') defaultElementID = $(this).attr('data-rule-id');
+								$(this).parents('tr').find('h4').text(priority);
+								rulesIDs += $(this).attr('data-rule-id') + ',';
+								priority++;
+								lastID = $(this).attr('data-rule-id');
+							});
+							
+							
+							if(!!defaultElementID && lastID != defaultElementID) {
+								alert('sorry but default is not sortable');
+								$(this).sortable( "cancel" );	
+								// and now we need to update the priority in the template again
+								var priority = 1;
+								$('.ss-gridfield-items tr h3').each( function(){
+									$(this).parents('tr').find('h4').text(priority);
+									rulesIDs += $(this).attr('data-rule-id') + ',';
+									priority++;
+								});
+							}
+							$.ajax({
+								url: 'personalisationruleshelper/on_after_sort',
+								type: 'POST',
+								data: 'ruleIDs=' + rulesIDs.substring(0,rulesIDs.length-1),
+								success: function(data){
+									// data = JSON.parse(data);
+									// if(data.type == 'good') {
+									// 	self.find('span.text').text(' ' + data.message); 
+									// 	self.attr('href', data.buttonLink); 
+									// }
+									
+								}
+							});
+						}
+					}
+				});
+			}
+		});
 	});
 
 })(jQuery);

@@ -22,9 +22,13 @@ class BasicPersonalisationRule extends DataObject {
 
 	function getCMSFields() {
 		$fields = parent::getCMSFields();
+
 		$fields->removeByName('EncodedCondition');
-		$fields->removeByName('ParentID');
+		$fields->renameField('ParentID', 'Personalisation Schema');
 		$fields->removeByName('VariationID');
+		$fields->removeByName('Priority');
+		
+		$fields->addFieldToTab('Root.Main', new ReadonlyField("PriorityHelp", "Priority", "Please assign this rule priority on the list view by dragging the to the appropriate position"));
 		if(!is_null($this->ParentID)){
 			$fields->addFieldToTab('Root.Main', new DropdownField("VariationID", "Variation", PersonalisationVariation::get()->filter(array("ParentID" => $this->ParentID))->map("ID", "Name"), null, "Select Variation"));
 		} else {
@@ -334,5 +338,31 @@ class RuleEditField extends FormField {
 		return  BasicPersonalisationRule::json_decode_typed($this->getForm()->getRecord()->EncodedCondition);
 	}
 
+}
+
+class PersonalisationRuleHelper extends Controller {
+
+	function on_after_sort() {
+
+		if(!isset($_POST['ruleIDs']) || $_POST['ruleIDs'] == '') return 'bad';
+
+		$vars = $_POST;
+		$ids = explode(',', $vars['ruleIDs']);
+		$priority = 1;
+		foreach($ids as $id) {
+			$rule = BasicPersonalisationRule::get()->byID((int)$id);
+			if($rule) {
+				if($rule->isDefault()) $rule->Priority = count($ids);
+				else {
+					$rule->Priority = $priority;
+					$priority++;
+				} 
+				$rule->write();
+				
+			}			
+		}
+		return 'good';
+
+	}
 }
 

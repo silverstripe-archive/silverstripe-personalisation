@@ -46,7 +46,7 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 			
 		);
 
-		$rulesField = new GridField('DecodedRules', 'Rules', $this->Rules(), $gridFieldConfig);
+		$rulesField = new GridField('DecodedRules', 'Rules', $this->getRules(), $gridFieldConfig);
 
 		// Validation
 		if(singleton('BasicPersonalisationRule')->hasMethod('getCMSValidator')) {
@@ -61,7 +61,6 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 
 	function generateRulesList() {
 		$rules = $this->getRules();
-		
 		$html = 'RULE';
 		if ($rules) foreach($rules as $rule) {
 			$html .= $this->generateRuleHTML(BasicPersonalisationRule::json_decode_typed($rule->EncodedCondition));
@@ -77,8 +76,8 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 	function getRules() {
 		$arrayRules = new ArrayList();
 		$sortedRules = new ArrayList();
-
-		if($rules = $this->Rules()) foreach($rules as $rule) {
+		
+		if($rules = $this->Rules()->sort('Priority ASC')) foreach($rules as $rule) {
 			$arrayRules->push($rule);
 		}
 		if($arrayRules) foreach($arrayRules as $rule) {
@@ -90,7 +89,7 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 		if($arrayRules->Count() > 0) {
 			$sortedRules->push($arrayRules->last());
 		}
-		
+
 		return $sortedRules;
 	}
 

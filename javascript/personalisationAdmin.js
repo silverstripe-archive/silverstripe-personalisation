@@ -106,6 +106,38 @@
 			}
 		});
 
+		$('.rule-line select.metadata').entwine({
+			onmatch: function() {
+				var options = this.find('option'),
+					option = null,
+					text = '',
+					metadataClass = '',
+					match = null,
+					pattern = /\[(\w*)\]/;
+
+				for(i = 0; i < options.length; i++) {
+					option = $(options[i]);
+					text = option.text();
+					match = text.match(pattern);
+
+					// Set metadata type in the html data attribute
+					if(match && match.length === 2) {
+						text = text.replace(pattern, '');
+						option
+							.text(text)
+							.attr('data-metadata-type', match[1].toLowerCase());
+					}  
+
+					// Sett namespace with wildcard to html data attribute
+					if(text.indexOf('.*') > -1) {
+						option
+							.text(text.replace('.*', ''))
+							.attr('data-metadata-wildcard', true);
+					}
+				}
+			}
+		});
+
 		$('.cms-edit-form .Actions input.action[type=submit], .cms-edit-form .Actions button.action').entwine({
 			/**
 			 * Function: onclick

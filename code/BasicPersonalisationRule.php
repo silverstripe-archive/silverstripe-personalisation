@@ -298,12 +298,19 @@ class RuleEditField extends FormField {
 		$rulesList = new ArrayList();
 		$always = false;
 		$operatorOptions = array(
-			BasicPersonalisationCondition::$op__equals => BasicPersonalisationCondition::$op__equals, 
-			BasicPersonalisationCondition::$op__notequals => BasicPersonalisationCondition::$op__notequals, 
-			BasicPersonalisationCondition::$op__contains => BasicPersonalisationCondition::$op__contains
+			BasicPersonalisationCondition::$op__equals => 'equal to', 
+			BasicPersonalisationCondition::$op__notequals => 'not equal to', 
+			BasicPersonalisationCondition::$op__contains => 'contains'
 		);
 
 		$i = 1;
+		$context = new DefaultContextProvider();
+		$metadata = $context->getMetadata(); 
+		$metadataMap = array(); 
+		foreach($metadata as $key => $item) {
+			$metadataMap[$key] = $key . " [{$item->class}]";
+		}
+		
 		if($rules) foreach($rules as $rule) {
 			if($rule->operator == BasicPersonalisationCondition::$op__always) { 
 				$always = true;
@@ -311,7 +318,7 @@ class RuleEditField extends FormField {
 			}
 			$rulesList->push(new ArrayData(array(
 				'Operator' => new DropdownField('Operator_'.$i, '', $operatorOptions, $rule->operator), 
-				'ParamOne' => new TextField('Param1_'.$i, '', $rule->param1->value),
+				'ParamOne' => DropdownField::create('Param1_'.$i, '', $metadataMap, $rule->param1->value)->addExtraClass('metadata'),
 				'ParamTwo' => new TextField('Param2_'.$i, '', $rule->param2->value)
 			)));
 			$i++;

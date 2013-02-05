@@ -135,7 +135,8 @@
 					});
 				}
 				resp = resp.substring(0, resp.length - 1);
-				resp += ']';
+				if(resp.length > 0) resp += ']';
+				else resp = '';
 				
 				form.find('input[name=EncodedCondition]').val(resp);
 			}
@@ -158,40 +159,34 @@
 					stop: function( event, ui ) {
 						
 						if(ui.item.find('.rule-operator').text() == 'always') {
-							alert('sorry but default is not sortable');
+							alert('Sorry but the default rule is not sortable and must always be last');
 							$(this).sortable( "cancel" );	
 						} else {
 							var defaultElementID = null;
 							var rulesIDs = '';
-							var priority = 1;
 							var lastID = null;
 							var zebra = 'odd';
-							$('.ss-gridfield-items tr h3').each( function(){
-								if($(this).parents('tr').find('.rule-operator').text() == 'always') defaultElementID = $(this).attr('data-rule-id');
-								$(this).parents('tr').find('h4').text(priority);
-								rulesIDs += $(this).attr('data-rule-id') + ',';
 
+							$('.ss-gridfield-items tr h3').each( function(){
+								if($(this).parents('tr').find('.rule-operator').text() == 'always') defaultElementID = $(this).attr('data-rule-id');	
+								rulesIDs += $(this).attr('data-rule-id') + ',';
 								$(this).parents('tr').removeClass('odd even');
 								$(this).parents('tr').addClass(zebra);
 								zebra = (zebra == 'odd') ? 'even' : 'odd';
-								priority++;
 								lastID = $(this).attr('data-rule-id');
 							});
 							
-							
 							if(!!defaultElementID && lastID != defaultElementID) {
-								alert('sorry but default must always have the lowest priority');
+								alert('Sorry but the default rule must always be last');
 								$(this).sortable( "cancel" );	
 								// and now we need to update the priority in the template again
 								var priority = 1;
 								var zebra = 'odd';
 								$('.ss-gridfield-items tr h3').each( function(){
-									$(this).parents('tr').find('h4').text(priority);
 									$(this).parents('tr').removeClass('odd even');
 									$(this).parents('tr').addClass(zebra);
 									zebra = (zebra == 'odd') ? 'even' : 'odd';
 									rulesIDs += $(this).attr('data-rule-id') + ',';
-									priority++;
 								});
 							}
 							$.ajax({

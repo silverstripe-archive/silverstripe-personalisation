@@ -39,7 +39,7 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 			new GridFieldToolbarHeader(),
 			new GridFieldAddNewButton(),
 			new GridFieldDataColumns(),
-			new GridFieldPaginator(15),
+			new GridFieldPaginator(30),
 			new GridFieldEditButton(),
 			new GridFieldDeleteAction(),
 			new GridFieldDetailForm()

@@ -1,5 +1,4 @@
 <h3 data-rule-id="$ID">$Title</h3>
-<h4>$Priority</h4>
 <% loop Rules %>
 	<p>
 		<% if ParamOne %><span class="rule-param1">$ParamOne</span><% end_if %>

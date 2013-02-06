@@ -1,3 +1,7 @@
+#EditEncodedCondition {
+	border: none;
+}
+
 .col-NiceDecodedCondition {
 	font-size: 16px;
 }
@@ -19,7 +23,44 @@
 	margin-top: 10px;
 }
 
+.rule-line .remove-rule {
+	display: inline-block;
+}
+
 .field input.text, .field select.dropdown {
 	width: 200px;
 	margin: 0 6px;
 }
+
+.cms .rule-line .mock-textfield {
+	display: none;
+	width: 137px;
+}
+
+	.rule-line .show-mock-textfield .mock-textfield {
+		display: inline;
+	}
+
+.cms .rule-line .metadata-dropdown {
+	width: 250px;
+	margin-left: 0;
+
+	transition: width 0.1s;
+	-moz-transition: width 0.1s; /* Firefox 4 */
+	-webkit-transition: width 0.1s; /* Safari and Chrome */
+	-o-transition: width 0.1s; /* Opera */
+}
+
+.cms .rule-line .show-mock-textfield .metadata-dropdown {
+	width: 96px;
+}
+
+.metadata-field-separator {
+	display: none;
+	margin-right: -3px;
+	font-size: 1.5em;
+}
+
+	.show-mock-textfield .metadata-field-separator {
+		display: inline;
+	}

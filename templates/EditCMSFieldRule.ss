@@ -3,16 +3,24 @@
 		Default Option (always true) <span>$DefaultOpt</span>
 	</p>
 <% end_if %>
+
+<div class="rule-lines">
+	<% loop Rules %>
+		<p class="rule-line">
+			<span class="paramone-field-wrapper">
+				$ParamOne
+				$ParamOneMockDropdown
+				<span class="metadata-field-separator">.</span> $ParamOneMockTextField
+			</span> 
+			<span>$Operator</span> 
+			<span>$ParamTwo</span>
+			<span class="rulesActions">
+				<a href="#" class="remove-rule ui-button-icon-primary ui-icon btn-icon-cross-circle">[x]</a>
+			</span>
+		</p>
+	<% end_loop %>
+</div>
+
 <p>
-	<% if showAddRulesLink %><a href="#" class="add-rule">Add rule</a><% else %><span id="isDefaultAlready">This is the default rule</span><% end_if %>
+	<% if showAddRulesLink %><a href="#" class="add-rule ss-ui-action-constructive ss-ui-button ui-button ui-widget ui-state-default ui-corner-all ui-button-text-icon-primary">Add rule</a><% else %><span id="isDefaultAlready">This is the default rule</span><% end_if %>
 </p>
-<% loop Rules %>
-	<p class="rule-line">
-		<span>$ParamOne</span> 
-		<span>$Operator</span> 
-		<span>$ParamTwo</span>
-		<span class="rulesActions">
-			<a href="#" class="remove-rule">[x]</a>
-		</span>
-	</p>
-<% end_loop %>

@@ -36,11 +36,22 @@
 		$('.remove-rule').entwine({
 			onclick: function() {
 				var self = this;
+					rules = this.parents('.rule-lines').find('.rule-line');
+
+				
 				this.parents('p').fadeOut('slow', function() { 
-					$(this).remove(); 
+					if(rules.length > 1) {
+						$(this).remove(); 
+					}
+					else {
+						$(this).hide();
+						$(this).parent().find('select, input').val('');
+					}
+
 					self.rearrangeRules(); 
 					$('.add-rule').updateState(); 
 				});
+
 				return false;
 			},
 			rearrangeRules: function() {
@@ -76,16 +87,17 @@
 
 		$('.add-rule').entwine({
 			onclick: function() {
-				if($('.rule-line').length) {
-					$('.rule-line:last').clone().appendTo('#EditEncodedCondition .middleColumn');
+				if($('.rule-line').length == 1 && $('.rule-line').is(':hidden')) {
+					$('.rule-line').show();
+				}
+				else {
+					$('.rule-line:last').clone().appendTo('#EditEncodedCondition .rule-lines');
 					$('.rule-line:last').find('input').each( function() {
 						$(this).val('');
 					});
 					$('.rule-line:last').find('select').each( function() {
 						$(this).val('eq');
 					});
-				} else {
-					$('<p class="rule-line"><span><input id="Param1_1" class="text nolabel" type="text" value="" name="Param1_1"></span><span><select id="Operator_1" class="dropdown nolabel" name="Operator_1"><option selected="" value="eq">eq</option><option value="ne">ne</option><option value="contains">contains</option></select></span><span><input type="text" id="Param2_1" class="text nolabel" value="" name="Param2_1"></span><span class="rulesActions"><a class="remove-rule" href="#">[x]</a></span></p>').appendTo('#EditEncodedCondition .middleColumn');
 				}
 				
 				this.updateState();
@@ -103,6 +115,118 @@
 
 				if($('.rule-line').length == 4) this.hide();
 				else this.show();
+			}
+		});
+
+		$('.paramone-field-wrapper input, .paramone-field-wrapper select').entwine({
+			onmatch: function() {
+				this._super();
+
+				if(this.hasClass('actual')) this.hide();
+			}
+		});
+
+		$('.paramone-field-wrapper .mock-textfield').entwine({
+			onmatch: function() {
+				var actual = this.siblings('.actual');
+				this.updateVisibility();
+			}, 
+
+			onchange: function() {
+				var actual = this.siblings('.actual');
+				actual.val(actual.val().replace('*', '') + this.val());
+			},
+
+			updateVisibility: function() {
+				var parent = this.parents('.paramone-field-wrapper'),
+					dropdown = this.siblings('.metadata-dropdown'); 
+				
+				if(dropdown.val().indexOf('*') > -1) {
+					parent.addClass('show-mock-textfield');
+				}
+				else {
+					parent.removeClass('show-mock-textfield');
+				}
+			}
+		});
+
+		$('.paramone-field-wrapper .metadata-dropdown').entwine({
+			onmatch: function() {
+				var actual = this.siblings('.actual'),
+					selected = this.find('option[value="' + actual.val() + '"]'),
+					mockTextField = this.siblings('.mock-textfield')
+					actualParts = null,
+					combinedPart = '';
+
+				this.setup(); 
+
+				if(selected.length > 0) {
+					selected.attr('selected', true);
+				}
+				else {
+					actualParts = actual.val().split('.');
+
+					for(i = 0; i < actualParts.length; i++) {
+						combinedPart = ''; 
+						for(j = 0; j < actualParts.length - i; j++) {
+							combinedPart = combinedPart ? combinedPart + '.' + actualParts[j] : actualParts[j];
+						}
+						
+						selected = this.find('option[value^="' + combinedPart + '"]');
+						if(selected.length > 0) {
+							mockTextField.val(actual.val().replace(combinedPart + '.', ''));
+							selected.attr('selected', true);
+							break;
+						}
+					}
+				}
+
+				mockTextField.updateVisibility();
+			}, 
+
+			/**
+			 * This method will add metadata type and wildcard flag to the select's options
+			 * and also format the options texts
+			 */
+			setup: function() {
+				var options = this.find('option'),
+					option = null,
+					text = '',
+					metadataClass = '',
+					match = null,
+					pattern = /\[(\w*)\]/;
+
+				for(i = 0; i < options.length; i++) {
+					option = $(options[i]);
+					text = option.text();
+					match = text.match(pattern);
+
+					// Set metadata type in the html data attribute
+					if(match && match.length === 2) {
+						text = text.replace(pattern, '');
+						option
+							.text(text)
+							.attr('data-metadata-type', match[1].toLowerCase());
+					}  
+
+					// Sett namespace with wildcard to html data attribute
+					if(text.indexOf('.*') > -1) {
+						option
+							.text(text.replace('.*', ''))
+							.attr('data-metadata-wildcard', true);
+					}
+				}
+			}, 
+
+			onchange: function() {
+				var siblings = this.siblings(),
+					actual = siblings.filter('.actual'),
+					mockTextField = siblings.filter('.mock-textfield');
+
+				actual.val(this.val());
+				mockTextField.val('');
+
+				mockTextField.updateVisibility();
 			}
 		});
 

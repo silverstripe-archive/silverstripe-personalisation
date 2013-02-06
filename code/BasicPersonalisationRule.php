@@ -318,7 +318,9 @@ class RuleEditField extends FormField {
 			}
 			$rulesList->push(new ArrayData(array(
 				'Operator' => new DropdownField('Operator_'.$i, '', $operatorOptions, $rule->operator), 
-				'ParamOne' => DropdownField::create('Param1_'.$i, '', $metadataMap, $rule->param1->value)->addExtraClass('metadata'),
+				'ParamOne' => TextField::create('Param1_'.$i, '', $rule->param1->value)->addExtraClass('actual'),
+				'ParamOneMockDropdown' => DropdownField::create('Param1_Mock_Dropdown'.$i, '', $metadataMap)->addExtraClass('metadata-dropdown'),
+				'ParamOneMockTextField' => TextField::create('Param1_Mock_TextField'.$i, '')->addExtraClass('mock-textfield'),
 				'ParamTwo' => new TextField('Param2_'.$i, '', $rule->param2->value)
 			)));
 			$i++;

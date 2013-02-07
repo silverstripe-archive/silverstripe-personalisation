@@ -25,7 +25,7 @@ class PersonalisationScheme extends DataObject {
 
 	public function ajaxLink() {
 		// Delegate link generation to the controller that will process it.
-		return PersonalisationController::calc_link($this);
+		return PersonalisationController::calc_ajax_link($this);
 	}
 }
 

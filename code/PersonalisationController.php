@@ -6,7 +6,7 @@
 class PersonalisationController extends Controller {
 
 	static $allowed_actions = array(
-		"get"
+		"fetch"
 	);
 
 	/**
@@ -14,8 +14,8 @@ class PersonalisationController extends Controller {
 	 * @return void
 	 */
 	// @todo provide control over mime type of the result.
-	public function get() {
-		$id = $this->getRequest()->getVar("ID");
+	public function fetch() {
+		$id = isset($this->urlParams["ID"]) ? $this->urlParams["ID"] : null;
 		if (!$id) {
 			return $this->httpError("404", "Not found");
 		}
@@ -25,7 +25,9 @@ class PersonalisationController extends Controller {
 			return $this->httpError("404", "Not found");
 		}
 
-		return $scheme->personalise($this);
+		$result = $scheme->personalise($this);
+		if (is_object($result)) $result = $result->forTemplate();
+		return $result;
 	}
 
 	/**
@@ -36,6 +38,6 @@ class PersonalisationController extends Controller {
 	 * @return void
 	 */
 	public static function calc_ajax_link($scheme) {
-		return Director::baseURL() . "/pers/get/{$scheme->ID}";
+		return Director::absoluteBaseURL() . "pers/fetch/{$scheme->ID}";
 	}
 }

@@ -10,13 +10,13 @@ class TemplateVariation extends PersonalisationVariation{
 		$fields = new FieldList();
 		$tempManifest = new SS_TemplateManifest(THEMES_PATH);
 		$templates = $tempManifest->getTemplates();
-		$tf = array();
 
+		$tf = array();
 		foreach($templates as $k => $v){
 			if(isset($v['themes'])) array_push($tf, $k);
 		}
-
 		$templateField = new DropDownField("TemplateName", "Template Name", $tf);
+
 		$fields->push($templateField);
 		return $fields;
 	}

@@ -333,4 +333,81 @@
 		});
 	});
 
+
+	$('#ImageType').entwine({
+		onmatch: function(){
+			$(this).showHideOptions();
+		},
+		onchange:  function(){
+			$(this).showHideOptions();
+		},
+		showHideOptions: function(){
+			if($("#Form_ItemEditForm_ImageType").val() == 1){
+				$('#PersonalisationSchemeID').hide();
+				$('#HeroImage').show();
+			}else{
+				$('#PersonalisationSchemeID').show();
+				$('#HeroImage').hide();
+			}
+		}
+	});
+
+	$('#LinkType').entwine({
+		onmatch: function(){
+			$(this).showHideOptions();
+		},
+		onchange:  function(){
+			$(this).showHideOptions();
+		},
+		showHideOptions: function(){
+			if($("#Form_ItemEditForm_LinkType").val() == 1){
+				$('#Link').hide();
+				$('#InternalLinkID').show();
+			}else{
+				$('#Link').show();
+				$('#InternalLinkID').hide();
+			}
+		}
+	});
+
+
+	/**
+	* Carousel
+	*/
+	$('.carousel').carousel();
+
+	$('.carousel').on('slid', function(e) {
+		var currSlide = $(this).find('.item.active'),
+	    pagings = $(this).find('.paging a');
+
+		pagings.removeClass('current');
+		pagings.filter(':nth-child(' + (currSlide.index() + 1) + ')').addClass('current');
+	});
+
+	$('.carousel .paging a').click(function(e) {
+	$('.carousel').carousel($(this).index());
+	$('.carousel').carousel('pause');
+		return false;
+	});
+
+	$('.carousel .item').click(function(e) {
+		var nthEmbedCode = $(this).index() + 1,
+	   	embed = $(this).parents('.carousel').find('.embedcode-wrapper-' + nthEmbedCode);
+
+		if(embed.length > 0) {
+	   	embed.modal('show');
+		}
+	});
+
+	/**
+	* Carousel
+	*/
+	$('.modal').on('hide', function() {
+		// Workaround to stop video from playing when the modal closes
+		var html = $(this).html();
+		$(this).html(html);
+	});
+
+
+
 })(jQuery);

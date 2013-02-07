@@ -335,7 +335,41 @@
 	});
 
 
+	$('#ImageType').entwine({
+		onmatch: function(){
+			$(this).showHideOptions();
+		},
+		onchange:  function(){
+			$(this).showHideOptions();
+		},
+		showHideOptions: function(){
+			if($("#Form_ItemEditForm_ImageType").val() == 1){
+				$('#PersonalisationSchemeID').hide();
+				$('#HeroImage').show();
+			}else{
+				$('#PersonalisationSchemeID').show();
+				$('#HeroImage').hide();
+			}
+		}
+	});
 
+	$('#LinkType').entwine({
+		onmatch: function(){
+			$(this).showHideOptions();
+		},
+		onchange:  function(){
+			$(this).showHideOptions();
+		},
+		showHideOptions: function(){
+			if($("#Form_ItemEditForm_LinkType").val() == 1){
+				$('#Link').hide();
+				$('#InternalLinkID').show();
+			}else{
+				$('#Link').show();
+				$('#InternalLinkID').hide();
+			}
+		}
+	});
 
 
 })(jQuery);

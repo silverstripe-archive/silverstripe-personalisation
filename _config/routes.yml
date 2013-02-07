@@ -4,3 +4,9 @@ Name: personalisationadminroutes
 Director:
   rules:
     'personalisationruleshelper': 'PersonalisationRuleHelper'
+---
+Name: personalisatonservices
+---
+Director:
+  rules:
+    'pers//$Action/$ID/$OtherID': 'PersonalisationController'

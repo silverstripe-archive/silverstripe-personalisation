@@ -22,5 +22,10 @@ class PersonalisationScheme extends DataObject {
 	public function canCreate($member = null) {
 		return false;
 	}
+
+	public function ajaxLink() {
+		// Delegate link generation to the controller that will process it.
+		return PersonalisationController::calc_link($this);
+	}
 }
 

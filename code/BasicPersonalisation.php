@@ -88,9 +88,13 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 		}
 		if($arrayRules->Count() > 0) {
 			$sortedRules->push($arrayRules->last());
+			return $sortedRules;
+		}else{
+			$list = new DataList('BasicPersonalisationRule');
+			return $list;
 		}
 
-		return $sortedRules;
+
 	}
 
 	function generateRuleHTML($rules) {

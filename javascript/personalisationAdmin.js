@@ -87,7 +87,6 @@
 
 		$('.add-rule').entwine({
 			onclick: function() {
-				console.log('hello paul!');
 				if($('.rule-line').length == 1 && $('.rule-line').is(':hidden')) {
 					$('.rule-line').show();
 				}

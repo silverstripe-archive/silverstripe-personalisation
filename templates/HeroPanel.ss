@@ -3,6 +3,6 @@
 
 <div id="slider">
 	<% loop HeroItems %>
-		<a href="$HeroLink"><img src="$HeroObject.URL" alt="$Name" /></a>
+		<a href="$HeroLink"><img src="$HeroObject.URL" /></a>
 	<% end_loop %>
 </div>

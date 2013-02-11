@@ -44,13 +44,46 @@ Planned features that are not currently present include:
  *	Extra rule base for automatic derivation of new properties in a tracking store, and a process to support that.
  *	Statistics gathering and reporting for variation rendering / clicks.
  *	More sophisticated querying of tracker.
+ *	Support for aging of tracker data
 
 
 ## Installation
 
+You'll need SilverStripe 3.0 or higher. Put the module directory into the top-level directory of your project as usual,
+and perform a dev/build.
+
+A Personalisation tab will appear on your site. By default it will enable the default tracker, which uses the
+SilverStripe database for storage.
 
 
 ## Configuration
+
+### Context Provider
+
+The main configuration at this point is around context provision. DefaultContextProvider, which is the default
+implementer of ContextProvider, maintains a list of handlers (which themselves implement ContextProvider). There are
+two handlers built in, both of which are enabled:
+
+ *	DefaultContextHandler implements a set of properties that expose the current request.
+ *	TrackerContextHandler extends this namespace with the Tracker functionality.
+
+You can add custom handlers by calling DefaultContextProvider::register_handler().
+
+### Tracker
+
+Tracking is performed by the Tracker class. This maintains a list of one or more objects that implement the
+TrackingStore interface.
+
+The tracker needs to be initialised before use. This is done by calling:
+
+	Tracker::init();
+
+This will initialise the Tracker and add DefaultTrackingStore as the sole tracking store.
+
+Alternatively, if you want to implement your own TrackingStore, you call initialise the tracker as follows:
+
+	Tracker::init();
+	Tracker::self::add_store("mytracker", "MyTrackingStoreClass");
 
 
 
@@ -68,7 +101,8 @@ The key classes and interfaces in the module are as follows:
  * DefaultContextProvider - a class that can pro
 
 The module is built to a set of principles:
- *	Core components are identified, and each has an interface to support multiple implementations.
+ *	Core components have interfaces, so that different components can be replaced if required.
+ *	Default implementations of these interfaces are provided so 
  *	Wherever possible, data and state is provisioned on-demand to minimise overhead.
  *	The set of state that is known about the user is derived from each request.
 

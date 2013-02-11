@@ -1,0 +1,7 @@
+---
+Name: defaultpersonalisation
+---
+DefaultContextProvider:
+  ContextHandlers:
+    'DefaultContextHandler': true
+    'TrackerContextHandler': true

@@ -321,13 +321,23 @@ class RuleEditField extends FormField {
 				continue;
 			}
 			$rulesList->push(new ArrayData(array(
-				'Operator' => new DropdownField('Operator_'.$i, '', $operatorOptions, $rule->operator), 
-				'ParamOne' => TextField::create('Param1_'.$i, '', $rule->param1->value)->addExtraClass('actual'),
+				'Operator' => new DropdownField('Operator_1', '', $operatorOptions, $rule->operator), 
+				'ParamOne' => TextField::create('Param1_1', '', $rule->param1->value)->addExtraClass('actual'),
+				'ParamOneMockDropdown' => DropdownField::create('Param1_Mock_Dropdown_1', '', $metadataMap)->addExtraClass('metadata-dropdown'),
+				'ParamOneMockTextField' => TextField::create('Param1_Mock_TextField1_', '')->addExtraClass('mock-textfield'),
+				'ParamTwo' => new TextField('Param2_1', '', $rule->param2->value)
+			)));
+			$i++;
+		}
+		else {
+			// If there's no rules at all, display an empty one
+			$rulesList->push(new ArrayData(array(
+				'Operator' => new DropdownField('Operator_'.$i, '', $operatorOptions), 
+				'ParamOne' => TextField::create('Param1_'.$i, '')->addExtraClass('actual'),
 				'ParamOneMockDropdown' => DropdownField::create('Param1_Mock_Dropdown'.$i, '', $metadataMap)->addExtraClass('metadata-dropdown'),
 				'ParamOneMockTextField' => TextField::create('Param1_Mock_TextField'.$i, '')->addExtraClass('mock-textfield'),
 				'ParamTwo' => new TextField('Param2_'.$i, '', $rule->param2->value)
 			)));
-			$i++;
 		}
 		
 		$defaultCheckbox = ($this->getForm()->getRecord()->Parent()->ID == 0 || $this->getForm()->getRecord()->Parent()->hasDefault()) ? null : new CheckboxField('DefaultOption', '', $always);

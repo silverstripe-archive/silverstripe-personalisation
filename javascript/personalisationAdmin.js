@@ -73,9 +73,11 @@
 					i++;
 				});
 			},
+
 			onmatch: function() {
 				this.updateState();
 			},
+
 			updateState: function() {
 				if($('#DefaultOption').is(':checked')) {
 					this.hide();
@@ -104,9 +106,11 @@
 				$('.remove-rule').rearrangeRules();
 				return false;
 			},
+			
 			onmatch: function() {
 				this.updateState();
 			},
+
 			updateState: function() {
 				if($('#DefaultOption').is(':checked')) {
 					this.hide();
@@ -126,15 +130,30 @@
 			}
 		});
 
+		$('.paramone-field-wrapper .actual').entwine({
+			updateValue: function(e) {
+				var val = '',
+					parent = this.parents('.paramone-field-wrapper'),
+					mockTextField = parent.find('.mock-textfield'),
+					mockDropdown = parent.find('.metadata-dropdown');
+
+				// Get value from the meta data dropdown
+				val = mockDropdown.val(); 
+
+				// Get value from the mock text field 
+				if(mockTextField.val()) val = val.replace(/\..*$/, '') + '.' +  mockTextField.val();
+
+				this.val(val);
+			}
+		});
+
 		$('.paramone-field-wrapper .mock-textfield').entwine({
 			onmatch: function() {
-				var actual = this.siblings('.actual');
 				this.updateVisibility();
 			}, 
 
 			onchange: function() {
-				var actual = this.siblings('.actual');
-				actual.val(actual.val().replace('*', '') + this.val());
+				this.siblings('.actual').updateValue();
 			},
 
 			updateVisibility: function() {
@@ -223,8 +242,8 @@
 					actual = siblings.filter('.actual'),
 					mockTextField = siblings.filter('.mock-textfield');
 
-				actual.val(this.val());
 				mockTextField.val('');
+				actual.updateValue();
 
 				mockTextField.updateVisibility();
 			}

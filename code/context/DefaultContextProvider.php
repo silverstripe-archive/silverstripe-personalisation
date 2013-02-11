@@ -11,14 +11,29 @@ class DefaultContextProvider implements ContextProvider {
 
 	/**
 	 * A list of handlers that the context provider uses to determine values that are requested. Each of these is
-	 * an instance that implements ContextProvider.
+	 * an instance that implements ContextProvider. This is initialised on demand by getHandlers().
 	 * @var array
 	 */
 	protected $handlers = array();
 
-	function __construct() {
-		$this->register_handler(new DefaultContextHandler());
-		$this->register_handler(new TrackerContextHandler());
+	/**
+	 * Gets the list of handlers. The handler list is populated on demand from the Config system. It uses
+	 * register_handler() to register the handlers that are defined.
+	 * @return void
+	 */
+	protected function getHandlers() {
+		if (!$this->handlers) {
+			$config = Config::inst();
+			$h  = $config->get("DefaultContextProvider", "ContextHandlers");
+			if (!$h) throw Exception("Personalisation module is mis-configured. There must be at least one context handler.");
+			foreach ($h as $class => $enabled) {
+				if ($enabled) {
+					$hi = new $class();
+					$this->register_handler($hi);
+				}
+			}
+		}
+		return $this->handlers;
 	}
 
 	/**
@@ -60,7 +75,7 @@ class DefaultContextProvider implements ContextProvider {
 		// Iterate over the handlers to fetch any properties that are not in result. When we get some back, we
 		// add to results, and the next handler will be asked for only what remains. Also, for each result we get
 		// back, we add it to the cache.
-		foreach ($this->handlers as $h) {
+		foreach ($this->getHandlers() as $h) {
 			// get the properties we haven't already got.
 			$request = array_diff_key($np, $result);
 
@@ -92,13 +107,21 @@ class DefaultContextProvider implements ContextProvider {
 		if (!$namespaces) $namespaces = "*";
 		if (!is_array($namespaces)) $namespaces = array($namespaces);
 
-		foreach ($this->handlers as $h) {
+		foreach ($this->getHandlers() as $h) {
 			$result = array_merge($result, $h->getMetadata($namespaces));
 		}
 
 		return $result;
 	}
 
+	/**
+	 * Register a context handler. Generally this is not called directly, but from getHandlers() which reads
+	 * the config on demand and registers the handlers that way. However, this function can also be used by
+	 * unit tests to bypass the config system.
+	 * @param $handler
+	 * @param string $place
+	 * @return void
+	 */
 	function register_handler($handler, $place = "end") {
 		if ($place == "end") $this->handlers[] = $handler;
 		else array_unshift($this->handlers, $handler);

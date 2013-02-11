@@ -1,5 +1,5 @@
 ---
-Name: defaultpersonalisation
+Name: contextprovider
 ---
 DefaultContextProvider:
   ContextHandlers:

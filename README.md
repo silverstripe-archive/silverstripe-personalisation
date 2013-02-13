@@ -24,9 +24,22 @@ Rules are executed within a **context**. This is an extendable set of properties
 can use to define the rules. The properties are organised into a namespace. Some properties are predefined by the module,
 but typically a site will introduce new properties, via custom context handlers or via the tracker.
 
-The module implements basic tracking, and can be made to use the session, a member login or a tracking cookie
+The module implements basic **tracking**, and can be made to use the session, a member login or a tracking cookie
 to track a user's actions on the site. The tracker exposes a simple API that lets the developer manipulate and
 query the information stored in the tracker.
+
+The key interfaces and classes are:
+
+ *	ContextProvider - the key interface that supports retrieving property values for personalisation decision making.
+ *	DefaultContextProvider - a default implementor of ContextProvider, and designed to be good for a wide range of uses.
+ 		It is anticipated that this will be used on all sites that have the module. It's behaviour can be extended
+ 		with handlers.
+ *	Tracker - the key interface for tracking behaviour. Generally this is called for writing only; reading is usually
+ 		performed through DefaultContextProvider, which asks the tracker for properties when it needs them.
+ *	TrackingStore - the key interface that needs to be implemented by anything that can store tracking information.
+ 		This includes rquerying, storing and getting metadata.
+ *	DefaultTrackingStore - a simple implementor of TrackingStore that is suitable for tracking on smaller scale
+	(e.g.
 
 
 ## Status
@@ -44,7 +57,7 @@ Planned features that are not currently present include:
  *	Extra rule base for automatic derivation of new properties in a tracking store, and a process to support that.
  *	Statistics gathering and reporting for variation rendering / clicks.
  *	More sophisticated querying of tracker.
- *	Support for aging of tracker data
+ *	Support for aging of tracker data and varying confidence levels
 
 
 ## Installation
@@ -52,22 +65,27 @@ Planned features that are not currently present include:
 You'll need SilverStripe 3.0 or higher. Put the module directory into the top-level directory of your project as usual,
 and perform a dev/build.
 
-A Personalisation tab will appear on your site. By default it will enable the default tracker, which uses the
+A Personalisation tab will appear in the CMS interface. By default it will enable the default tracker, which uses the
 SilverStripe database for storage.
 
 
 ## Configuration
 
-### Context Provider
+The module uses the SilverStripe 3 configuration system, and provides default values for personalisation config items,
+which can be overridden by project as required.
 
-The main configuration at this point is around context provision. DefaultContextProvider, which is the default
-implementer of ContextProvider, maintains a list of handlers (which themselves implement ContextProvider). There are
-two handlers built in, both of which are enabled:
+
+### Default Context Provider
+
+DefaultContextProvider, which is the default implementer of ContextProvider, maintains a list of handlers (which
+themselves implement ContextProvider). There are two handlers built in, both of which are enabled:
 
  *	DefaultContextHandler implements a set of properties that expose the current request.
  *	TrackerContextHandler extends this namespace with the Tracker functionality.
 
-You can add custom handlers by calling DefaultContextProvider::register_handler().
+The default configuration is in personalisation/_config/default.yml
+
+To define your own context handler, you can
 
 ### Tracker
 
@@ -98,11 +116,12 @@ The key classes and interfaces in the module are as follows:
  *	ContextProvider - an interface that defines methods for retrieving properties that can be used in determining
  		personalised output. This includes a method for retrieving one or more properties, as well as retrieving
  		metadata about those properties. Notable implementors include DefaultContextProvider and Tracker.
- * DefaultContextProvider - a class that can pro
+ *  DefaultContextProvider - a class that can pro
 
 The module is built to a set of principles:
  *	Core components have interfaces, so that different components can be replaced if required.
- *	Default implementations of these interfaces are provided so 
+ *	Default implementations of these interfaces are provided and configured so there is reasonable behaviour out of the
+    box.
  *	Wherever possible, data and state is provisioned on-demand to minimise overhead.
  *	The set of state that is known about the user is derived from each request.
 

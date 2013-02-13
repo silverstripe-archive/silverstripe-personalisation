@@ -6,7 +6,7 @@ class PersonalisationAdmin extends ModelAdmin {
 
 	static $menu_title = 'Personalisation';
 
-	public static $managed_models = array('BasicPersonalisation');
+	public static $managed_models = array('BasicPersonalisation', 'ABTestingScheme');
 
 	public static function managed_personalisation_models() {
 		$classes = array();

@@ -25,7 +25,7 @@ class DefaultTrackingStore implements TrackingStore {
 				->innerJoin("DefaultTrackingStoreItem_Identities", "\"DefaultTrackingStoreItem\".\"ID\"=\"DefaultTrackingStoreItem_Identities\".\"DefaultTrackingStoreItemID\"")
 				->where("\"PropertyID\" = " . $propID)
 				->where("\"DefaultTrackingStoreItem_Identities\".\"DefaultTrackingStoreIdentityID\" in (" . implode($ids, ",") . ")")
-				->sort("\"LastEdited\" desc")
+				->sort("\"LastEdited\" desc, \"ID\" desc")
 				->limit($property->getMaxRequested());
 			$values = array();
 			foreach ($items as $item) {

@@ -4,4 +4,5 @@ Name: contextprovider
 DefaultContextProvider:
   ContextHandlers:
     'DefaultContextHandler': true
+    'DefaultBrowserHandler': true
     'TrackerContextHandler': true

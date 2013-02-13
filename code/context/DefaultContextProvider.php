@@ -208,7 +208,6 @@ class DefaultContextHandler implements ContextProvider {
 	}
 
 	static $metadata = array(
-		"browser.*"			=> "Text", 			// @todo expand browser property metadata
 		"request.method"	=> "Enum('GET,POST,PUT,DELETE','GET')",
 		"request.referer"	=> "Text",
 		"request.url"		=> "Text",
@@ -233,6 +232,117 @@ class DefaultContextHandler implements ContextProvider {
 			}
 		}
 		return $result;
+	}
+}
+
+
+class DefaultBrowserHandler implements ContextProvider{
+
+	protected $userAgent;
+
+	static $metadata = array(
+		"browser.type" => "Text",
+		"browser.form" => "Text",
+		"browser.os" => "Text"
+	);
+
+	function getProperties($properties){
+		$result = array();
+		foreach ($properties as $name => $def) {
+			switch ($name) {
+				case "browser.type":
+					$v = $this->getBrowserType();
+					break;
+
+				case "browser.form":
+					$v = $this->getBrowserForm();
+					break;
+
+				case "browser.os":
+					$v = $this->getOS();
+					break;
+
+				default:
+					$v = null;
+			}
+
+			if ($v !== null) {
+				$v = new ContextProperty(array(
+					"name" => $name,
+					"value" => $v,
+					"confidence" => 100  // we're completely sure of the request.
+				));
+				$v = array($v);			// always an array, even for single values
+				$result[$name] = $v;
+			}
+		}
+
+		return $result;
+
+	}
+
+
+	function getMetadata($namespaces = null){
+		$result = array();
+		foreach ($namespaces as $ns) {
+			// force match to full namespace components
+			if (substr($ns, -1) != ".") $ns .= ".";
+
+			foreach (self::$metadata as $property => $def) {
+				if ($ns == "*." || substr($property, 0, strlen($ns)) == $ns) {
+					// this property matches up to the length of the name space
+					$inst = Object::create_from_string($def);
+					$result[$property] = $inst;
+				}
+			}
+		}
+		return $result;
+	}
+
+	function getBrowserType(){
+		if(!$this->userAgent){
+			$this->userAgent = $_SERVER['HTTP_USER_AGENT'];
+		}
+
+		$bh = new BrowserHelper();
+		switch(true){
+			case($bh::is_firefox($this->userAgent)): return "firefox";
+			case($bh::is_msie($this->userAgent)): return "msie";
+			case($bh::is_opera($this->userAgent)): return "opera";
+			case($bh::is_safari($this->userAgent)): return "safari";
+			default: return "unknown";
+		}
+	}
+
+	function getBrowserForm(){
+		if(!$this->userAgent){
+			$this->userAgent = $_SERVER['HTTP_USER_AGENT'];
+		}
+
+		$bh = new BrowserHelper();
+		switch(true){
+			case($bh::is_tablet($this->userAgent)): return "tablet";
+			case($bh::is_mobile($this->userAgent)): return "mobile";
+			case($bh::is_desktop($this->userAgent)): return "desktop";
+			default: return "unknown";
+		}
+	}
+
+	function getOS(){
+		if(!$this->userAgent){
+			$this->userAgent = $_SERVER['HTTP_USER_AGENT'];
+		}
+
+		$bh = new BrowserHelper();
+		switch(true){
+			case($bh::is_iphone($this->userAgent)): return "iOS";
+			case($bh::is_OSX($this->userAgent)): return "OSX";
+			case($bh::is_android($this->userAgent)): return "android";
+			case($bh::is_windows($this->userAgent)): return "windows";
+			case($bh::is_win_phone($this->userAgent)): return "windows phone";
+			default: return "unknown";
+
+		}
 	}
 }
 

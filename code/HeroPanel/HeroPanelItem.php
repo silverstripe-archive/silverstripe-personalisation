@@ -44,15 +44,15 @@ class HeroPanelItem extends DataObject{
 		if($this->ImageType == 1){
 			return $this->HeroImage();
 		}elseif($this->ImageType == 2){
-			return $this->Personalise();
+			return $this->PersonalisedHero();
 		}else{
 			return null;
 		}
 	}
 
-	function Personalise() {
+	function PersonalisedHero() {
 		if($this->PersonalisationSchemeID && $ps = PersonalisationScheme::get_by_id("PersonalisationScheme",  $this->PersonalisationSchemeID)){
-			return PersonalisationScheme::personalise_with($ps->Title);
+			return PersonalisationScheme::personalise_with($ps->Title, Controller::curr());
 		}else{
 			return null;
 		}

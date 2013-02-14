@@ -6,8 +6,9 @@ class TemplateVariation extends PersonalisationVariation{
 		"TemplateName" => "Varchar"
 	);
 
-	static function addExtraFields(){
-		$fields = new FieldList();
+	function getCMSFields() {
+		$fields = parent::getCMSFields();
+
 		$tempManifest = new SS_TemplateManifest(THEMES_PATH);
 		$templates = $tempManifest->getTemplates();
 
@@ -18,6 +19,7 @@ class TemplateVariation extends PersonalisationVariation{
 		$templateField = new DropDownField("TemplateName", "Template Name", $tf);
 
 		$fields->push($templateField);
+
 		return $fields;
 	}
 

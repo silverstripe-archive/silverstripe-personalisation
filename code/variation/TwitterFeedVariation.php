@@ -10,10 +10,12 @@ class TwitterFeedVariation extends PersonalisationVariation{
 		"NoOfTweets" => "Int"
 	);
 
-	static function addExtraFields(){
-		$fields = new FieldList();
+	function getCMSFields() {
+		$fields = parent::getCMSFields();
+
 		$acctName = new TextField("AccountName", "Account Name");
 		$fields->push($acctName);
+
 		return $fields;
 	}
 

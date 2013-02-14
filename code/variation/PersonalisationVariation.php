@@ -26,28 +26,48 @@ class PersonalisationVariation extends DataObject {
 		// should be overridden by subclasses.
 	}
 
-	function getCMSFields(){
+	static $called = false;
+
+	/**
+	 * Get fields. This is a bit hacky to get around ModelAdmin limitations. Basically, if we are adding a new
+	 * record, we actually want to return the fields of the specific subclass not PersonalisationVariation itself.
+	 * So we look for that condition, and if we get it, we create a subclass instance and return it's fields. It will
+	 * in turn call this function, so we need to protect against multiple calls.
+	 * @return FieldList
+	 */
+	function getCMSFields() {
+		if (isset($_REQUEST["sc"]) && !self::$called) {
+			// just create an instance and return getCMSFields on that
+			$subclass = $_REQUEST["sc"];
+			$inst = new $subclass;
+
+			// prevent handling this case again.
+			self::$called = true;
+
+			// Get the fields from the subclass. It will in turn self::getCMSFields, but that one will return the actual
+			// fields of this class.
+			return $inst->getCMSFields();
+		}
+
 		$fields = parent::getCMSFields();
+
 		$fields->removeByName("ParentID");
 
-		if(isset($_REQUEST["sc"])){
+		if(isset($_REQUEST["sc"])) {
 			$subclass = $_REQUEST["sc"];
 			if(ClassInfo::exists($subclass)){
 				$className = preg_replace('/(?!^)[[:upper:]]+/',' \0',$subclass);
 				$fields->addFieldToTab("Root.Main", new HiddenField("SubClass", "SubClass", $subclass));
 				if(isset($_REQUEST["id"])) $fields->addFieldToTab("Root.Main", new HiddenField("ParentID", "ParentID", $_REQUEST["id"]));
 				$fields->addFieldToTab("Root.Main", new ReadonlyField("Class", "Variation Type", $className), "Name");
-
-				$extraFields = $subclass::addExtraFields();
-				$fields->merge($extraFields);
 			}
-		}else{
+		}
+		else {
 			$className = preg_replace('/(?!^)[[:upper:]]+/',' \0',$this->ClassName);
 			$fields->addFieldToTab("Root.Main", new ReadonlyField("Class", "Variation Type", $className), "Name");
 		}
 		return $fields;
 	}
-
 
 	//do some stuff to save subclass information
 	function onBeforeWrite(){

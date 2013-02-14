@@ -13,8 +13,9 @@ class SWFVariation extends PersonalisationVariation{
 		"FallBackImage" => "Image"
  	);
 
-	static function addExtraFields(){
-		$fields = new FieldList();
+	function getCMSFields() {
+		$fields = parent::getCMSFields();
+
 //		$internalSWF = new UploadField("SWFFileID",  "Choose swf from assets" );
 //		$internalSWF->getValidator()->setAllowedExtensions(array('swf'));
 		$internalSWF = new ReadonlyField('SwfVariation', 'SWF Variation From Assets', 'Links to swfs in files and assets can be added after you have saved for the first time');
@@ -25,6 +26,7 @@ class SWFVariation extends PersonalisationVariation{
 		$fields->push($externalSWF);
 		$fallBackImage = new ReadonlyField('Variation', 'Fall Back Image', ' Fall Back Images can be added after you have saved for the first time');
 		$fields->push($fallBackImage);
+
 		return $fields;
 	}
 

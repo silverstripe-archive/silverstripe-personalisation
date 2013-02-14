@@ -14,12 +14,18 @@ class ImageVariation extends PersonalisationVariation {
 		return $this->Image();
 	}
 
-	static function addExtraFields(){
-		$fields = new FieldList();
+	function getCMSFields() {
+		$fields = parent::getCMSFields();
+
 		$url = new TextField("VariationURL", "Variation URL");
 		$fields->push($url);
-		$imageField = new ReadonlyField('Variation', 'Variation', 'Images can be added after you have saved for the first time');
-		$fields->push($imageField);
+
+		if (!$this->ID) {
+			$fields->removeByName("Image");
+			$imageField = new ReadonlyField('Variation', 'Variation', 'Images can be added after you have saved for the first time');
+			$fields->push($imageField);
+		}
+
 		return $fields;
 	}
 

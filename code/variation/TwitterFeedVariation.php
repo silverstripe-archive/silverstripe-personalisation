@@ -19,6 +19,10 @@ class TwitterFeedVariation extends PersonalisationVariation{
 		return $fields;
 	}
 
+	function helperText() {
+		return "lets you display Twitter feed items from a given Twitter account as the output.";
+	}
+
 	function render(ContextProvider $context, Controller $controller = null) {
 		return $controller->customise(array("Tweets" => $this->getTweets()))->renderWith('TwitterFeedVariation');
 	}

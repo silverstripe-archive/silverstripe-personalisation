@@ -18,6 +18,10 @@ class TextVariation extends PersonalisationVariation {
 		return $fields;
 	}
 
+	function helperText() {
+		return "lets you show rich text as the output. Properties can optionally be substituted using {{name}} syntax.";
+	}
+
 	function render(ContextProvider $context, Controller $controller = null) {
 		$text = $this->Text;
 

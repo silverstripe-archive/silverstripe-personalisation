@@ -16,4 +16,8 @@ class NestedVariation extends PersonalisationVariation {
 		return $this->Scheme()->personalise($controller);
 	}
 
+	function helperText() {
+		return "lets you use another scheme as the output, e.g. to A/B test one of your variations.";
+	}
+
 }

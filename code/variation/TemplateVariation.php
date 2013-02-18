@@ -23,6 +23,10 @@ class TemplateVariation extends PersonalisationVariation{
 		return $fields;
 	}
 
+	function helperText() {
+		return "lets you use a SilverStripe template file from your site theme as the output.";
+	}
+
 	function render(ContextProvider $context, Controller $controller = null) {
 		$templateName = $this->TemplateName;
 

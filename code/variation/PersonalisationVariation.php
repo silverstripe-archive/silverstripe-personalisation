@@ -53,20 +53,34 @@ class PersonalisationVariation extends DataObject {
 
 		$fields->removeByName("ParentID");
 
+		if ($helperText = $this->helperText()) {
+			$helperText = "  - " . $helperText;
+		}
+
 		if(isset($_REQUEST["sc"])) {
 			$subclass = $_REQUEST["sc"];
 			if(ClassInfo::exists($subclass)){
 				$className = preg_replace('/(?!^)[[:upper:]]+/',' \0',$subclass);
 				$fields->addFieldToTab("Root.Main", new HiddenField("SubClass", "SubClass", $subclass));
 				if(isset($_REQUEST["id"])) $fields->addFieldToTab("Root.Main", new HiddenField("ParentID", "ParentID", $_REQUEST["id"]));
-				$fields->addFieldToTab("Root.Main", new ReadonlyField("Class", "Variation Type", $className), "Name");
+				$fields->addFieldToTab("Root.Main", new ReadonlyField("Class", "Variation Type", $className . $helperText), "Name");
 			}
 		}
 		else {
 			$className = preg_replace('/(?!^)[[:upper:]]+/',' \0',$this->ClassName);
-			$fields->addFieldToTab("Root.Main", new ReadonlyField("Class", "Variation Type", $className), "Name");
+			$fields->addFieldToTab("Root.Main", new ReadonlyField("Class", "Variation Type", $className . $helperText), "Name");
 		}
+
 		return $fields;
+	}
+
+	/**
+	 * This returns helper text that is displayed at the top of the editor form for a personaliation variation.
+	 * Subclasses can override this function if they want to provide helper text.
+	 * @return string
+	 */
+	function helperText() {
+		return "";
 	}
 
 	//do some stuff to save subclass information

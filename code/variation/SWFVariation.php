@@ -30,6 +30,10 @@ class SWFVariation extends PersonalisationVariation{
 		return $fields;
 	}
 
+	function helperText() {
+		return "lets you use Flash (SWF) file as the output, with an optional fallback image for devices that don't support Flash.";
+	}
+
 	function render(ContextProvider $context, Controller $controller = null) {
 		$swfdetails = new ArrayList();
 		if($this->SWFFileID && $swf = File::get_by_id("File", $this->SWFFileID)){

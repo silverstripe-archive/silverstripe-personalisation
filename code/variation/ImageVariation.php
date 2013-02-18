@@ -29,6 +29,10 @@ class ImageVariation extends PersonalisationVariation {
 		return $fields;
 	}
 
+	function helperText() {
+		return "lets you display an image as the output, with an optional URL to make it clickable.";
+	}
+
 	/**
 	 *
 	 * @return null|string

@@ -122,7 +122,7 @@
 			}
 		});
 
-		$('.paramone-field-wrapper input, .paramone-field-wrapper select').entwine({
+		$('.param-one input, .param-one select').entwine({
 			onmatch: function() {
 				this._super();
 
@@ -130,10 +130,10 @@
 			}
 		});
 
-		$('.paramone-field-wrapper .actual').entwine({
+		$('.param-one .actual').entwine({
 			updateValue: function(e) {
 				var val = '',
-					parent = this.parents('.paramone-field-wrapper'),
+					parent = this.parents('.param-one'),
 					mockTextField = parent.find('.mock-textfield'),
 					mockDropdown = parent.find('.metadata-dropdown');
 
@@ -147,7 +147,7 @@
 			}
 		});
 
-		$('.paramone-field-wrapper .mock-textfield').entwine({
+		$('.param-one .mock-textfield').entwine({
 			onmatch: function() {
 				this.updateVisibility();
 			}, 
@@ -157,7 +157,7 @@
 			},
 
 			updateVisibility: function() {
-				var parent = this.parents('.paramone-field-wrapper'),
+				var parent = this.parents('.param-one'),
 					dropdown = this.siblings('.metadata-dropdown'); 
 				
 				if(dropdown.val().indexOf('*') > -1) {
@@ -169,24 +169,32 @@
 			}
 		});
 
-		$('.paramone-field-wrapper .mock-enumfield').entwine({
+		$('.rule-line .mock-enumfield').entwine({
 			onmatch: function() {
 				var self = this;
 
 				setTimeout(function() {
 					self.updateVisibility(); 
+					self.val(self.siblings('.actual').val());
 				}, 200);
 			}, 
 
 			onchange: function() {
-				this.siblings('.actual').updateValue();
+				this.siblings('.actual').val(this.val());
 			},
 
 			updateVisibility: function() {
-				var parent = this.parents('.paramone-field-wrapper'),
-					selected = this.siblings('.metadata-dropdown').find('option:selected'); 
-				
+				var parent = this.parents('.rule-line'),
+					selected = parent.find('.metadata-dropdown option:selected'),
+					values = selected.attr('data-metadata-enum-values'),
+					items = []; 
+
 				if(selected.attr('data-metadata-type') == 'enum') {
+					if(values) {
+						items = values.split(',');
+						this.populateValues(items);
+					}
+
 					parent.addClass('show-mock-enumfield');
 				}
 				else {
@@ -194,12 +202,23 @@
 				}
 			},
 
-			setValues: function() {
+			/**
+			 * @param 	array
+			 */
+			populateValues: function(items) {
+				var html = '',
+					value = '';
+
+				for(i = 0; i < items.length; i++) {
+					value = $.trim(items[i]);
+					html += '<option value="' + value + '">' + value + '</option>';
+				}
 				
+				this.html(html);
 			}
 		});
 
-		$('.paramone-field-wrapper .metadata-dropdown').entwine({
+		$('.param-one .metadata-dropdown').entwine({
 			onmatch: function() {
 				var actual = this.siblings('.actual'),
 					selected = this.find('option[value="' + actual.val() + '"]'),
@@ -279,10 +298,14 @@
 			}, 
 
 			onchange: function() {
-				var siblings = this.siblings(),
-					actual = siblings.filter('.actual'),
-					mockTextField = siblings.filter('.mock-textfield'),
-					mockEnumField = siblings.filter('.mock-enumfield');
+				var parent = this.parents('.rule-line'),
+					actual = parent.find('.actual'),
+					param2Actual = parent.find('.param-two .actual'),
+					mockTextField = parent.find('.mock-textfield'),
+					mockEnumField = parent.find('.mock-enumfield');
+
+				param2Actual.val('');
+
 
 				mockTextField.val('');
 				mockEnumField.val('');

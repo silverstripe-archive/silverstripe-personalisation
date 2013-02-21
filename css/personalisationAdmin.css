@@ -37,12 +37,20 @@
 	width: 137px;
 }
 
+	.cms .rule-line .mock-enumfield {
+		width: 200px;
+	}
+
 	.rule-line .show-mock-textfield .mock-textfield {
 		display: inline;
 	}
 
-	.rule-line .show-mock-enumfield .mock-enumfield {
+	.rule-line.show-mock-enumfield .mock-enumfield {
 		display: inline;
+	}
+
+	.rule-line.show-mock-enumfield .param-two .actual{
+		display: none;
 	}
 
 .cms .rule-line .metadata-dropdown {
@@ -65,7 +73,7 @@
 	font-size: 1.5em;
 }
 
-	.show-mock-textfield .metadata-field-separator, .show-mock-enumfield .metadata-field-separator {
+	.show-mock-textfield .metadata-field-separator {
 		display: inline;
 	}
 

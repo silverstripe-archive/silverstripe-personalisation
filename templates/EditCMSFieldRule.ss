@@ -7,15 +7,17 @@
 <div class="rule-lines">
 	<% loop Rules %>
 		<p class="rule-line">
-			<span class="paramone-field-wrapper">
+			<span class="param-one">
 				$ParamOne
 				$ParamOneMockDropdown
 				<span class="metadata-field-separator">.</span> 
 				$ParamOneMockTextField
-				$ParamOneMockEnumField
 			</span> 
 			<span>$Operator</span> 
-			<span>$ParamTwo</span>
+			<span class="param-two">
+				$ParamTwo
+				$ParamTwoMockEnumField
+			</span>
 			<span class="rulesActions">
 				<a href="#" class="remove-rule ui-button-icon-primary ui-icon btn-icon-cross-circle">[x]</a>
 			</span>

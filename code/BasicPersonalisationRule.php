@@ -320,13 +320,14 @@ class RuleEditField extends FormField {
 				$always = true;
 				continue;
 			}
+
 			$rulesList->push(new ArrayData(array(
 				'Operator' => new DropdownField('Operator_' . $i, '', $operatorOptions, $rule->operator), 
 				'ParamOne' => TextField::create('Param1_' . $i, '', $rule->param1->value)->addExtraClass('actual'),
 				'ParamOneMockDropdown' => DropdownField::create('Param1_Mock_Dropdown_' . $i, '', $metadataMap)->addExtraClass('metadata-dropdown'),
 				'ParamOneMockTextField' => TextField::create('Param1_Mock_TextField_' . $i, '')->addExtraClass('mock-textfield'),
-				'ParamOneMockEnumField' => DropdownField::create('Param1_Mock_EnumField_' . $i, '')->addExtraClass('mock-enumfield'),
-				'ParamTwo' => new TextField('Param2_' . $i, '', $rule->param2->value)
+				'ParamTwo' => TextField::create('Param2_' . $i, '', $rule->param2->value)->addExtraClass('actual'),
+				'ParamTwoMockEnumField' => DropdownField::create('Param2_Mock_EnumField_' . $i, '')->addExtraClass('mock-enumfield'),
 			)));
 			$i++;
 		}
@@ -337,8 +338,8 @@ class RuleEditField extends FormField {
 				'ParamOne' => TextField::create('Param1_1', '')->addExtraClass('actual'),
 				'ParamOneMockDropdown' => DropdownField::create('Param1_Mock_Dropdown'.$i, '', $metadataMap)->addExtraClass('metadata-dropdown'),
 				'ParamOneMockTextField' => TextField::create('Param1_Mock_TextField'.$i, '')->addExtraClass('mock-textfield'),
-				'ParamOneMockEnumField' => DropdownField::create('Param1_Mock_EnumField_' . $i, '')->addExtraClass('mock-enumfield'),
-				'ParamTwo' => new TextField('Param2_1', '')
+				'ParamTwo' => TextField::create('Param2_' . $i, '', $rule->param2->value)->addExtraClass('actual'),
+				'ParamTwoMockEnumField' => DropdownField::create('Param2_Mock_EnumField_' . $i, '')->addExtraClass('mock-enumfield')
 			)));
 		}
 		

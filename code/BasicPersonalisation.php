@@ -47,13 +47,12 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 		);
 
 		$rulesField = new GridField('DecodedRules', 'Rules', $this->getRulesList(), $gridFieldConfig);
-
+		$rulesField->setModelClass("BasicPersonalisationRule");
 		// Validation
 		if(singleton('BasicPersonalisationRule')->hasMethod('getCMSValidator')) {
 			$detailValidator = singleton('BasicPersonalisationRule')->getCMSValidator();
 			$rulesField->getConfig()->getComponentByType('GridFieldDetailForm')->setValidator($detailValidator);
 		}
-
 
 		$fields->addFieldToTab('Root.Rules', $rulesField);
 		return $fields;
@@ -88,13 +87,12 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 				$arrayRules->remove($rule);
 			}
 		}
+
 		if($arrayRules->Count() > 0) {
 			$sortedRules->push($arrayRules->last());
-			return $sortedRules;
-		}else{
-			return $sortedRules;
 		}
 
+		return $sortedRules;
 
 	}
 
@@ -151,6 +149,8 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 		$cp = $this->getContextProvider();
 
 		$var = $this->getVariation($cp, $this);
+
+		if (!$var) return null;
 
 		$this->trackRender($var);
 

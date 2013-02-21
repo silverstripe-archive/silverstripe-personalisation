@@ -7,6 +7,7 @@ class HeroPanelItem extends DataObject{
 		"Link" => "Varchar(255)",
 		"ImageType" => "Int",
 		"LinkType" => "Int",
+		"Sequence" => "Int"
  	);
 
 	static $has_one = array(

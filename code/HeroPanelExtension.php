@@ -14,7 +14,7 @@ class HeroPanelExtension extends DataExtension{
 
 	function HeroPanel(){
 		Requirements::css("personalisation/javascript/jsImgSlider/themes/1/js-image-slider.css");
-		$heroItems = $this->owner->getComponents("HeroItems");
+		$heroItems = $this->owner->getComponents("HeroItems")->Sort("Sequence");
 		return $this->owner->customise(array("HeroItems" =>  $heroItems))->renderWith("HeroPanel");
 	}
 

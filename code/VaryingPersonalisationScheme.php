@@ -78,6 +78,7 @@ class VaryingPersonalisationScheme extends PersonalisationScheme {
 	 */
 	protected function trackRender($var) {
 		if (!$this->MeasurementEnabled) return;
+		if (!$var) return;
 
 		$prop = $this->getRenderProperty();
 		Tracker::track(array($prop => $var->ID));

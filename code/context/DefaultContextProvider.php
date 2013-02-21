@@ -157,6 +157,10 @@ class DefaultContextHandler implements ContextProvider {
 					$v = $this->getLocationProperty($parts);
 					break;
 
+				case "member":
+					$v = $this->getMemberProperty($parts);
+					break;
+
 				default:
 					$v = null;
 			}
@@ -195,6 +199,20 @@ class DefaultContextHandler implements ContextProvider {
 		return null;
 	}
 
+	function getMemberProperty($parts) {
+		if (!isset($parts[1])) return null;
+
+		switch ($parts[1]) {
+			case "loggedin":
+				// Return true if logged in, false if not
+				if (Member::currentUserID()) return "Yes";
+				return "No";
+
+			default:
+				return null;
+		}
+	}
+
 	function getRequestCookie($parts) {
 		if (count($parts) < 2) return null;
 		if (!isset($_COOKIE[$parts[1]])) return null;
@@ -213,6 +231,7 @@ class DefaultContextHandler implements ContextProvider {
 		"request.url"		=> "Text",
 		"cookie.*"			=> "Text",
 		"get.*"				=> "Text",
+		"member.loggedin"	=> "Enum('True,False', 'False')",
 		"location.*"		=> "Text"			// @todo expand location.* properties
 	);
 

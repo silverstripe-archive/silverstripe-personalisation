@@ -1,5 +1,13 @@
 <?php
 
+/**
+ * This is a default implementation of the tracking store. It is a "poor man's" implementation that should be suitable
+ * for simple installations where the number of users and/or the number of tracked items is not too large.
+ * The querying functions are fairly basic, and probably not too performant.
+ * 
+ * @throws Exception
+ *
+ */
 class DefaultTrackingStore implements TrackingStore {
 
 	function init($params) {
@@ -111,7 +119,7 @@ class DefaultTrackingStore implements TrackingStore {
 		foreach ($namespaces as $ns) {
 			// force match to full namespace components
 			if (substr($ns, -1) != ".") $ns .= ".";
-
+	
 			foreach ($defined as $property => $def) {
 				if ($ns == "*." || substr($property, 0, strlen($ns)) == $ns) {
 					// this property matches up to the length of the name space
@@ -121,6 +129,152 @@ class DefaultTrackingStore implements TrackingStore {
 			}
 		}
 
+		return $result;
+	}
+
+	/**
+	 * @param $pipeline		An array of maps that define the sequence of things to do. Each map has at least properties:
+	 * 							"function"		name of function supported by the tracking store
+	 * 							"params"		a map of additional parameters to that function.
+	 * 						The output of each pipeline element is fed as input to the next stage. The initial dataset
+	 * 						is empty, so typically the first function in the pipeline is a generator of data from the
+	 * 						store.
+	 * @return non-null value if there is a result, null if there is an error
+	 */
+	function query($pipeline) {
+		$data = array();
+		foreach ($pipeline as $function) {
+			$data = $this->executeFunction($function, $data);
+			if ($data === null) return null;  // error
+		}
+		return $data;
+	}
+
+	protected static $supported_functions = array(
+		"getEvents",
+		"countByTime"
+	);
+
+	protected function executeFunction($fn, $inputData) {
+		$name = $fn["function"];
+		$params = isset($fn["params"]) ? $fn["params"] : array();
+
+		if (! in_array($name, self::$supported_functions)) throw new Exception("executeFunction: $name is not a supported function");
+		// if function is foo, we'll call executeFnFoo
+		$fnName = "executeFn" . ucfirst($name);
+
+		return $this->$fnName($params, $inputData);
+	}
+
+	/**
+	 * Retrieve a list of events that is filtered by something. Params may include:
+	 *   - startTime - timestamp of start of date range
+	 *   - endTime - timestamp of end of date range
+	 *   - property - property name, or array of property names, to filter to.
+	 * @param $params
+	 * @return void
+	 */
+	protected function executeFnGetEvents($params, $data) {
+		// there must be at least a property or properties provided
+		if (!isset($params["property"])) throw new Exception("executeFnGetEvents: property must be supplied");
+
+		$props = $params["property"];
+		if (is_string($props)) $props = array($props);
+		if (!is_array($props)) throw new Exception("executeFnGetEvents: properties must be an array or single string");
+
+		// translate the property names into property IDs
+		$propIDs = array();
+		$propMap = array();
+		foreach ($props as $p) {
+			$id = DefaultTrackingStoreProperty::get_id_from_name($p);
+			if ($id) {
+				$propIDs[] = $id;
+				$propMap[$id] = $p;
+			}
+		}
+
+		// If none of the request properties actually exist, return an empty result.
+		if (count($propIDs) == 0)
+			return array();
+
+		$query = DefaultTrackingStoreItem::get()->where("\"PropertyID\" in (" . implode(",", $propIDs) . ")");
+
+		// Add in date filters if they are present
+		if (isset($params["startTime"])) {
+			$query->where("\"Created\" >= " . date("Y-m-d h:i:s", $params["startTime"]));
+		}
+
+		if (isset($params["endTime"])) {
+			$query->where("\"Created\" < " . date("Y-m-d h:i:s", $params["endTime"]));
+		}
+
+		if (isset($params["values"])) {
+			$values = $params["values"];
+			if (!is_array($values)) $values = array($values);
+			for ($i = 0; $i < count($values); $i++)
+				$values[$i] = "'". addslashes($values[$i]) . "'";
+			$query->where("\"Value\" in (" . implode(",", $values) . ")");
+		}
+
+		$result = $query->toArray();
+
+		foreach ($result as $rec) {
+			$rec->PropertyName = $propMap[$rec->PropertyID];
+		}
+		return $result;
+	}
+
+	/**
+	 * Map of period names to the number of seconds used for grouping.
+	 * @var array
+	 */
+	static $periods = array(
+		"minute" => 60,
+		"hour" => 3600,
+		"day" => 86400,
+		"week" => 604800
+	);
+
+	/**
+	 * Given a set of events, group them by time and count them. Returns an array of maps with "time" and "count"
+	 * properties.
+	 * @param $params
+	 * @param $data
+	 * @return void
+	 */
+	protected function executeFnCountByTime($params, $data) {
+		$period = isset($params["period"]) ? $params["period"] : "hour";
+		if (!isset(self::$periods[$period])) throw new Exception("Invalid periond $period");
+		$sec = self::$periods[$period];
+
+		$min = 4102444800;
+		$max = 0;
+
+		$counts = array();
+		foreach ($data as $item) {
+			$t = strtotime($item->Created);
+			$m = $t % $sec;
+			$t -= $m;
+			if ($t < $min) $min = $t;
+			if ($t > $max) $max = $t;
+			$counts[$t] = isset($counts[$t]) ? $counts[$t] + 1 : 1;
+		}
+
+		// Fill in the spaces with zero
+		if (count($counts) > 0) {
+			for ($t = $min; $t < $max; $t+=$sec) {
+				if (!isset($counts[$t]))
+					$counts[$t] = 0;
+			}
+		}
+
+		ksort($counts);
+
+		//die ("input data: " . print_r($data,true) . " and output is " . print_r($counts, true));
+		$result = array();
+		foreach ($counts as $time => $count) {
+			$result[] = array("time" => $time, "count" => $count);
+		}
 		return $result;
 	}
 

@@ -176,6 +176,23 @@ class Tracker {
 		$inst->setProperties(self::find_identities(), $properties);
 	}
 
+	static function query($pipeline, $storeName = null) {
+		if (count(self::$tracking_stores) == 0)
+			throw new Exception("Attempting to query tracking store, but none are configured.");
+
+		if ($storeName) {
+			if (!isset(self::$tracking_stores[$storeName]))
+				throw new Exception("Attempting to query tracking store called '$storeName' which is not configured.");
+		}
+		else {
+			reset(self::$tracking_stores);
+			$storeName = key(self::$tracking_stores);
+		}
+
+		$inst = self::get_store_inst($storeName);
+		return $inst->query($pipeline);
+	}
+
 	/**
 	 * Get the instance of the named tracking store. This is created and initialised on demand.
 	 * @static

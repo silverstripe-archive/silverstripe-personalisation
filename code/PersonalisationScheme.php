@@ -3,7 +3,13 @@
 class PersonalisationScheme extends DataObject {
 
 	static $db = array(
-		"Title" => "Varchar(255)"
+		"Title" => "Varchar(255)",
+		"MeasurementEnabled" => "Boolean"
+	);
+
+	static $has_many = array(
+		// Optional measures defined for this scheme
+		"Measure" => "PersonalisationMeasure"
 	);
 
 	/**
@@ -27,5 +33,34 @@ class PersonalisationScheme extends DataObject {
 		// Delegate link generation to the controller that will process it.
 		return PersonalisationController::calc_ajax_link($this);
 	}
+
+	function getCMSFields() {
+		Requirements::javascript("personalisation/javascript/PersonalisationReportsField.js");
+		Requirements::customScript("var CurrentPersonalisationSchemeID=" . $this->ID . ";");
+		$fields = parent::getCMSFields();
+
+		$reports = PersonalisationReport::reports_for($this);
+		$reportsDisplay = new PersonalisationReportsField('ReportsGrid', '');
+		$reportsDisplay->setData($reports);
+		$fields->addFieldToTab("Root.Reports", $reportsDisplay);
+
+		return $fields;
+	}
+
+	function getReport() {
+		return "foo";
+	}
 }
 
+class PersonalisationReportsField extends FormField {
+
+	var $data;
+
+	function setData($data) {
+		$this->data = $data;
+	}
+
+//	function Field() {
+//		return "boo";
+//	}
+}

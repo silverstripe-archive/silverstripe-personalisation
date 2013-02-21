@@ -9,4 +9,5 @@ Name: personalisatonservices
 ---
 Director:
   rules:
+    'pers//reports/$Action/$Report/$ID/$OtherID': PersonalisationReportController
     'pers//$Action/$ID/$OtherID': 'PersonalisationController'

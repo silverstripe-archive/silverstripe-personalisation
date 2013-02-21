@@ -90,6 +90,18 @@ class PersonalisationAdmin extends ModelAdmin {
 		return $form;
 	}
 
+	function init() {
+		parent::init();
+		Requirements::css("personalisation/css/personalisationAdmin.css");
+		Requirements::javascript("personalisation/thirdparty/flot-0.7/jquery.flot.js");
+		Requirements::customScript(
+			"var personalisationReportsBase='" . PersonalisationReportController::$base_link . "';"
+		);
+	}
+
+	function getReport() {
+
+	}
 }
 
 class GridFieldConfig_RecordEditor_Personalisation extends GridFieldConfig {
@@ -114,6 +126,10 @@ class GridFieldConfig_RecordEditor_Personalisation extends GridFieldConfig {
 		$sort->setThrowExceptionOnBadDataType(false);
 		$filter->setThrowExceptionOnBadDataType(false);
 		$pagination->setThrowExceptionOnBadDataType(false);
+	}
+
+	public function getReports() {
+		return "foo";
 	}
 }
 

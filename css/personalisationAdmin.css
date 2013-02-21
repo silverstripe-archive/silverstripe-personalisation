@@ -64,3 +64,13 @@
 	.show-mock-textfield .metadata-field-separator {
 		display: inline;
 	}
+
+/** Reporting */
+.el-report-list {
+	width: 200px;
+	float: left;
+}
+
+.el-report-detail {
+	float: left;
+}

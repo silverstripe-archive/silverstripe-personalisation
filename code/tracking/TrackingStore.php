@@ -103,4 +103,13 @@ interface TrackingStore {
 	 * for querying on. External accessors to a tracking store may define new properties that Tracker is not aware of.
 	 */
 	function getMetadata(array $namespaces);
+
+	/**
+	 * Query the tracking store.
+	 * The API and behaviour of this method is still under development and is subject to change.
+	 * @abstract
+	 * @param $options
+	 * @return void
+	 */
+	function query($pipeline);
 }

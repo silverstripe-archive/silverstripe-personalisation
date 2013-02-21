@@ -44,6 +44,7 @@ $idents = DefaultTrackingStoreIdentity::get()->toArray();
 	}
 
 	function testMetadata() {
+		echo "testMetadata\n";
 		Tracker::init();
 
 		$propName = "tracker.test.metadata";
@@ -77,5 +78,36 @@ $idents = DefaultTrackingStoreIdentity::get()->toArray();
 
 		$this->assertTrue(isset($metadata[$propName]), "'a' is present");
 		$this->assertTrue(is_object($metadata[$propName]) && $metadata[$propName] instanceof Text, "'$propName' is a text property");
+	}
+
+	function testQuerying() {
+		Tracker::init();
+
+		$data = Tracker::query(array(
+			array(
+				"function" => "getEvents",
+				"params" => array(
+					"property" => "a"
+				)
+			),
+		));
+
+		echo "Raw data is " . print_r($data,true);
+//		// get 3 properties. none should exist.
+//		$props = Tracker::get_properties(array("a", "b", "c"));
+//
+//		reset($props);
+//		$this->assertTrue(!isset($props["a"]), "Check not found property");
+//
+//		// get 3 properties. none should exist, but null if not found is false, so no keys should be set.
+//		$props = Tracker::get_properties(array("a", "b", "c"), null, false);
+//		$this->assertEquals(count($props), 0);
+//
+//		Tracker::track(array(
+//			"a" => "value a",
+//			"c" => "value c"
+//		));
+//$items = DefaultTrackingStoreItem::get()->toArray();
+//$idents = DefaultTrackingStoreIdentity::get()->toArray();
 	}
 }

@@ -37,8 +37,12 @@ class VaryingPersonalisationScheme extends PersonalisationScheme {
 		}
 
 		if ($var === null) {
-			// @todo if we can't determine a variation that is within this scheme, use the default for the scheme, or first.
+			// if we can't determine a variation that is within this scheme, use the default for the scheme, or first.
+			$var = $this->Variations()->First();
+			if (!$var) return "";   // bah, give up. if the user can't be bothered configuring it, they can't expect magic.
 		}
+
+		$this->trackRender($var);
 
 		return $var->render($cp);
 	}
@@ -61,5 +65,21 @@ class VaryingPersonalisationScheme extends PersonalisationScheme {
 
 	public function canCreate($member = null) {
 		return false;
+	}
+
+	public function getRenderProperty() {
+		return "personalisation.measure." . $this->ID . ".render";
+	}
+
+	/**
+	 * If measurement is enabled for this scheme, then we need to track that this was rendered for the current
+	 * identity.
+	 * @return void
+	 */
+	protected function trackRender($var) {
+		if (!$this->MeasurementEnabled) return;
+
+		$prop = $this->getRenderProperty();
+		Tracker::track(array($prop => $var->ID));
 	}
 }

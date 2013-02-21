@@ -151,6 +151,8 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 
 		$var = $this->getVariation($cp, $this);
 
+		$this->trackRender($var);
+
 		return $var->render(null, $controller);
 	}
 

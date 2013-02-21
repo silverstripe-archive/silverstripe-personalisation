@@ -19,6 +19,9 @@ class ABTestingScheme extends VaryingPersonalisationScheme {
 		$cp = $this->getContextProvider();
 
 		$var = $this->getVariation($cp, $this);
+
+		$this->trackRender($var);
+
 		return $var->render(null, $controller);
 	}
 

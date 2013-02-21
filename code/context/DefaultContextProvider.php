@@ -159,7 +159,6 @@ class DefaultContextHandler implements ContextProvider {
 
 				case "member":
 					$v = $this->getMemberProperty($parts);
-					Debug::show("member prop:" . $v);
 					break;
 
 				default:

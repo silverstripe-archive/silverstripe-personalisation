@@ -10,7 +10,9 @@
 			<span class="paramone-field-wrapper">
 				$ParamOne
 				$ParamOneMockDropdown
-				<span class="metadata-field-separator">.</span> $ParamOneMockTextField
+				<span class="metadata-field-separator">.</span> 
+				$ParamOneMockTextField
+				$ParamOneMockEnumField
 			</span> 
 			<span>$Operator</span> 
 			<span>$ParamTwo</span>

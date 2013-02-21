@@ -32,12 +32,16 @@
 	margin: 0 6px;
 }
 
-.cms .rule-line .mock-textfield {
+.cms .rule-line .mock-textfield, .cms .rule-line .mock-enumfield {
 	display: none;
 	width: 137px;
 }
 
 	.rule-line .show-mock-textfield .mock-textfield {
+		display: inline;
+	}
+
+	.rule-line .show-mock-enumfield .mock-enumfield {
 		display: inline;
 	}
 
@@ -51,7 +55,7 @@
 	-o-transition: width 0.1s; /* Opera */
 }
 
-.cms .rule-line .show-mock-textfield .metadata-dropdown {
+.cms .rule-line .show-mock-textfield .metadata-dropdown, .cms .rule-line .show-mock-enumfield .metadata-dropdown {
 	width: 96px;
 }
 
@@ -61,7 +65,7 @@
 	font-size: 1.5em;
 }
 
-	.show-mock-textfield .metadata-field-separator {
+	.show-mock-textfield .metadata-field-separator, .show-mock-enumfield .metadata-field-separator {
 		display: inline;
 	}
 

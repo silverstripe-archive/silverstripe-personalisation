@@ -169,11 +169,41 @@
 			}
 		});
 
+		$('.paramone-field-wrapper .mock-enumfield').entwine({
+			onmatch: function() {
+				var self = this;
+
+				setTimeout(function() {
+					self.updateVisibility(); 
+				}, 200);
+			}, 
+
+			onchange: function() {
+				this.siblings('.actual').updateValue();
+			},
+
+			updateVisibility: function() {
+				var parent = this.parents('.paramone-field-wrapper'),
+					selected = this.siblings('.metadata-dropdown').find('option:selected'); 
+				
+				if(selected.attr('data-metadata-type') == 'enum') {
+					parent.addClass('show-mock-enumfield');
+				}
+				else {
+					parent.removeClass('show-mock-enumfield');
+				}
+			},
+
+			setValues: function() {
+				
+			}
+		});
+
 		$('.paramone-field-wrapper .metadata-dropdown').entwine({
 			onmatch: function() {
 				var actual = this.siblings('.actual'),
 					selected = this.find('option[value="' + actual.val() + '"]'),
-					mockTextField = this.siblings('.mock-textfield')
+					mockTextField = this.siblings('.mock-textfield'),
 					actualParts = null,
 					combinedPart = '';
 
@@ -213,20 +243,31 @@
 					text = '',
 					metadataClass = '',
 					match = null,
-					pattern = /\[(\w*)\]/;
+					classPattern = /\[(\w*)\]/,
+					enumValPattern = /\{([\w,-]*)\}/;
 
 				for(i = 0; i < options.length; i++) {
 					option = $(options[i]);
 					text = option.text();
-					match = text.match(pattern);
+					classMatch = text.match(classPattern),
+					enumValMatch = text.match(enumValPattern);
 
 					// Set metadata type in the html data attribute
-					if(match && match.length === 2) {
-						text = text.replace(pattern, '');
+					if(classMatch && classMatch.length === 2) {
+						text = text.replace(classPattern, '');
 						option
 							.text(text)
-							.attr('data-metadata-type', match[1].toLowerCase());
+							.attr('data-metadata-type', classMatch[1].toLowerCase());
 					}  
+
+					// Set metadata enum values in the html data attribute
+					
+					if(enumValMatch && enumValMatch.length === 2) {
+						text = text.replace(enumValPattern, '');
+						option
+							.text(text)
+							.attr('data-metadata-enum-values', enumValMatch[1]);
+					}  					
 
 					// Sett namespace with wildcard to html data attribute
 					if(text.indexOf('.*') > -1) {
@@ -240,12 +281,15 @@
 			onchange: function() {
 				var siblings = this.siblings(),
 					actual = siblings.filter('.actual'),
-					mockTextField = siblings.filter('.mock-textfield');
+					mockTextField = siblings.filter('.mock-textfield'),
+					mockEnumField = siblings.filter('.mock-enumfield');
 
 				mockTextField.val('');
+				mockEnumField.val('');
 				actual.updateValue();
 
 				mockTextField.updateVisibility();
+				mockEnumField.updateVisibility();
 			}
 		});
 

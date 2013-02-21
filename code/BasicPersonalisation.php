@@ -34,7 +34,7 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 		$variationsField = new GridField('Variations', 'Variations', PersonalisationVariation::get()->filter(array("ParentID" => $this->ID)), $variationGridField);
 		$fields->addFieldToTab('Root.Variations', $variationsField);
 
-		$rules = $this->generateRulesList();
+//		$rules = $this->generateRulesList();
 		$gridFieldConfig = GridFieldConfig::create()->addComponents(
 			new GridFieldToolbarHeader(),
 			new GridFieldAddNewButton(),
@@ -46,7 +46,7 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 			
 		);
 
-		$rulesField = new GridField('DecodedRules', 'Rules', $this->getRules(), $gridFieldConfig);
+		$rulesField = new GridField('DecodedRules', 'Rules', $this->getRulesList(), $gridFieldConfig);
 
 		// Validation
 		if(singleton('BasicPersonalisationRule')->hasMethod('getCMSValidator')) {
@@ -59,8 +59,9 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 		return $fields;
 	}
 
+	// @todo MS: I don't see this being used or adding value. Perhaps it can be removed.
 	function generateRulesList() {
-		$rules = $this->getRules();
+		$rules = $this->getRulesList();
 		$html = 'RULE';
 		if ($rules) foreach($rules as $rule) {
 			$html .= $this->generateRuleHTML(BasicPersonalisationRule::json_decode_typed($rule->EncodedCondition));
@@ -73,13 +74,14 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 	/**
 	 * this method sorts rules so Default will be always the last one to be displayed
 	**/
-	function getRules() {
+	function getRulesList() {
 		$arrayRules = new ArrayList();
 		$sortedRules = new ArrayList();
 		
-		if($rules = $this->Rules()->sort('Priority ASC')) foreach($rules as $rule) {
+		if($rules = $this->Rules()->filter("ParentID", $this->ID)->sort('Priority ASC')) foreach($rules as $rule) {
 			$arrayRules->push($rule);
 		}
+
 		if($arrayRules) foreach($arrayRules as $rule) {
 			if($rule->isDefault() === false) {
 				$sortedRules->push($rule);
@@ -90,8 +92,7 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 			$sortedRules->push($arrayRules->last());
 			return $sortedRules;
 		}else{
-			$list = new DataList('BasicPersonalisationRule');
-			return $list;
+			return $sortedRules;
 		}
 
 

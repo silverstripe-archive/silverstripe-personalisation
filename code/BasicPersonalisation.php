@@ -119,7 +119,7 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 	 * @return void
 	 */
 	function getVariation(ContextProvider $context, PersonalisationSource $source) {
-		$rules = $this->Rules();
+		$rules = $this->Rules()->Sort("Priority");
 
 		// First, aggregate together the properties we'll check. We do this so we can fetch them in one call,
 		// which is more efficient when fetching from a tracking store, especially if there is an external

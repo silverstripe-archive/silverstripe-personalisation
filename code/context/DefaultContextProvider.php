@@ -205,8 +205,8 @@ class DefaultContextHandler implements ContextProvider {
 		switch ($parts[1]) {
 			case "loggedin":
 				// Return true if logged in, false if not
-				if (Member::currentUserID()) return "Yes";
-				return "No";
+				if (Member::currentUserID()) return "True";
+				return "False";
 
 			default:
 				return null;

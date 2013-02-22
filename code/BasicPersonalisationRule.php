@@ -100,6 +100,7 @@ class BasicPersonalisationRule extends DataObject {
 	// If the condition on the rule matches, return the variation.
 	function variationOnMatch($context) {
 		$conds = $this->getCondition();
+
 		$b = true;
 		foreach ($conds as $cond) {
 			if (!$cond->IsTrue($context)) {
@@ -338,7 +339,7 @@ class RuleEditField extends FormField {
 				'ParamOne' => TextField::create('Param1_1', '')->addExtraClass('actual'),
 				'ParamOneMockDropdown' => DropdownField::create('Param1_Mock_Dropdown'.$i, '', $metadataMap)->addExtraClass('metadata-dropdown'),
 				'ParamOneMockTextField' => TextField::create('Param1_Mock_TextField'.$i, '')->addExtraClass('mock-textfield'),
-				'ParamTwo' => TextField::create('Param2_' . $i, '', $rule->param2->value)->addExtraClass('actual'),
+				'ParamTwo' => TextField::create('Param2_' . $i, '')->addExtraClass('actual'),
 				'ParamTwoMockEnumField' => DropdownField::create('Param2_Mock_EnumField_' . $i, '')->addExtraClass('mock-enumfield')
 			)));
 		}

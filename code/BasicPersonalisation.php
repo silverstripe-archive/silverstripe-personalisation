@@ -6,6 +6,8 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 		"Rules" => "BasicPersonalisationRule"
 	);
 
+	static $is_abstract = false;
+
 	function getCMSFields() {
 		Requirements::css('personalisation/css/personalisationAdmin.css');
 		Requirements::javascript('personalisation/javascript/personalisationAdmin.js');

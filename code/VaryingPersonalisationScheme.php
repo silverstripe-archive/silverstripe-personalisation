@@ -11,6 +11,8 @@ class VaryingPersonalisationScheme extends PersonalisationScheme {
 		"Variations" => "PersonalisationVariation"
 	);
 
+	static $is_abstract = true;
+
 	function getCMSFields(){
 		$fields = parent::getCMSFields();
 		$fields->removeByName("ContextProviderClass");

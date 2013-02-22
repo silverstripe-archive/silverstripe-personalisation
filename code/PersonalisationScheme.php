@@ -12,6 +12,12 @@ class PersonalisationScheme extends DataObject {
 		"Measure" => "PersonalisationMeasure"
 	);
 
+	static $summary_fields = array(
+		'Title', 'ClassName'
+	);
+
+	static $is_abstract = false;
+
 	/**
 	 * Perform the personalisation. This should be overridden by sub classes.
 	 * @return null

@@ -11,6 +11,8 @@ class ABTestingScheme extends VaryingPersonalisationScheme {
 		"VariationPropertyName" => "Varchar(255)"
 	);
 
+	static $is_abstract = false;
+
 	function canCreate($member = null) {
 		return true;
 	}

@@ -6,7 +6,8 @@ class PersonalisationAdmin extends ModelAdmin {
 
 	static $menu_title = 'Personalisation';
 
-	public static $managed_models = array('BasicPersonalisation', 'ABTestingScheme');
+	public static $managed_models = array('BasicPersonalisation');
+	
 
 	public static function managed_personalisation_models() {
 		$classes = array();
@@ -14,8 +15,8 @@ class PersonalisationAdmin extends ModelAdmin {
 			if($class == 'PersonalisationScheme') continue;
 			if(ClassInfo::classImplements($class, 'TestOnly')) continue;
 
-			// if(singleton($class)->canCreate()) $classes[] = $class;
-			$classes[] = $class;
+			$tempObj = singleton($class);	
+			if(!$tempObj::$is_abstract) $classes[] = $class;
 		}
 		
 		return $classes;
@@ -90,8 +91,19 @@ class PersonalisationAdmin extends ModelAdmin {
 		return $form;
 	}
 
-	function init() {
-		parent::init();
+	public function init() {
+		LeftAndMain::init();
+
+		$models = $this->getManagedModels();
+
+		if($this->request->param('ModelClass')) {
+			$this->modelClass = $this->unsanitiseClassName($this->request->param('ModelClass'));
+		} else {
+			reset($models);
+			$this->modelClass = key($models);
+		}
+		
+		Requirements::javascript(FRAMEWORK_ADMIN_DIR . '/javascript/ModelAdmin.js');
 		Requirements::css("personalisation/css/personalisationAdmin.css");
 		Requirements::javascript("personalisation/thirdparty/flot-0.7/jquery.flot.js");
 		Requirements::customScript(
@@ -101,6 +113,12 @@ class PersonalisationAdmin extends ModelAdmin {
 
 	function getReport() {
 
+	}
+
+	public function Breadcrumbs($unlinked = false) { return new ArrayList(); }
+
+	function Backlink() {
+		return 'admin/personalisation';
 	}
 }
 
@@ -149,50 +167,33 @@ class GridFieldAddNewButton_Personalisation implements GridField_HTMLProvider {
 	}
 
 	public function getHTMLFragments($gridField) {
+
 		if(!$this->buttonName) {
-			// provide a default button name, can be changed by calling {@link setButtonName()} on this component
 			$objectName = singleton($gridField->getModelClass())->i18n_singular_name();
 			$this->buttonName = _t('GridField.Add', 'Add {name}', array('name' => $objectName));
 		}
+		$managedClasses = PersonalisationAdmin::managed_personalisation_models();
+		
+		$buttons = new ArrayList();
+		foreach($managedClasses as $managedClass) {
+
+			$gridField->setModelClass($managedClass);
+			$gridField->getForm()->setFormAction('admin/personalisation/'.$managedClass.'/EditForm/');
+			$gridField->setName($managedClass);
+			
+			$buttons->push(new ArrayData(array(
+				'NewLink' => Controller::join_links($gridField->Link('item'), 'new'), 
+				'ButtonName' => ucwords(trim(strtolower(preg_replace('/_?([A-Z])/', ' $1', $managedClass))))
+			)));
+		}
 
 		$data = new ArrayData(array(
-			'NewLink' => Controller::join_links($gridField->Link('item'), 'new'),
-			'ButtonName' => $this->buttonName,
+			'Buttons' => $buttons
 		));
-
+		
 		return array(
-			$this->targetFragment => $data->renderWith('GridFieldAddNewbutton'),
+			$this->targetFragment => $data->renderWith('GridFieldAddNewbutton_Personalisation'),
 		);
 	}
-
-
-	// public function getHTMLFragments($gridField) {
-
-	// 	if(!$this->buttonName) {
-	// 		$objectName = singleton($gridField->getModelClass())->i18n_singular_name();
-	// 		$this->buttonName = _t('GridField.Add', 'Add {name}', array('name' => $objectName));
-	// 	}
-	// 	$managedClasses = PersonalisationAdmin::managed_personalisation_models();
-		
-	// 	$buttons = new ArrayList();
-	// 	foreach($managedClasses as $managedClass) {
-	// 		$gridField->setModelClass($managedClass);
-	// 		$gridField->getForm()->setFormAction('admin/personalisation/'.$managedClass);
-	// 		$gridField->setName($managedClass);
-			
-	// 		$buttons->push(new ArrayData(array(
-	// 			'NewLink' => Controller::join_links($gridField->Link('item'), 'new'), 
-	// 			'ButtonName' => ucwords(trim(strtolower(preg_replace('/_?([A-Z])/', ' $1', $managedClass))))
-	// 		)));
-	// 	}
-
-	// 	$data = new ArrayData(array(
-	// 		'Buttons' => $buttons
-	// 	));
-
-	// 	return array(
-	// 		$this->targetFragment => $data->renderWith('GridFieldAddNewbutton_Personalisation'),
-	// 	);
-	// }
 
 }

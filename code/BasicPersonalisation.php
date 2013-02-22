@@ -154,7 +154,7 @@ class BasicPersonalisation extends VaryingPersonalisationScheme implements Selec
 
 		$this->trackRender($var);
 
-		return $var->render(null, $controller);
+		return $var->render($cp, $controller);
 	}
 
 	function canCreate($member = null) {

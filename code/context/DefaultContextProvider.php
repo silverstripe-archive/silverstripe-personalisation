@@ -260,9 +260,9 @@ class DefaultBrowserHandler implements ContextProvider{
 	protected $userAgent;
 
 	static $metadata = array(
-		"browser.type" => "Text",
-		"browser.form" => "Text",
-		"browser.os" => "Text"
+		"browser.type" => "Enum('msie,firefox,opera,safari,unknown','unknown')",
+		"browser.form" => "Enum('mobile,tablet,desktop,unknown','unknown')",
+		"browser.os" => "Enum('OSX,windows,iOS,android,windows-phone,unknown','unknown')"
 	);
 
 	function getProperties($properties){
@@ -325,6 +325,7 @@ class DefaultBrowserHandler implements ContextProvider{
 
 		$bh = new BrowserHelper();
 		switch(true){
+			// @todo add chrome!!!
 			case($bh::is_firefox($this->userAgent)): return "firefox";
 			case($bh::is_msie($this->userAgent)): return "msie";
 			case($bh::is_opera($this->userAgent)): return "opera";
@@ -358,7 +359,7 @@ class DefaultBrowserHandler implements ContextProvider{
 			case($bh::is_OSX($this->userAgent)): return "OSX";
 			case($bh::is_android($this->userAgent)): return "android";
 			case($bh::is_windows($this->userAgent)): return "windows";
-			case($bh::is_win_phone($this->userAgent)): return "windows phone";
+			case($bh::is_win_phone($this->userAgent)): return "windows-phone";
 			default: return "unknown";
 
 		}

@@ -171,11 +171,18 @@
 
 		$('.rule-line .mock-enumfield').entwine({
 			onmatch: function() {
-				var self = this;
+				var self = this,
+					actual = self.siblings('.actual');
 
 				setTimeout(function() {
 					self.updateVisibility(); 
-					self.val(self.siblings('.actual').val());
+					if(actual.val()) {
+						self.val(actual.val());
+					}
+					else {
+						actual.val(self.val());
+					}
+
 				}, 200);
 			}, 
 
@@ -220,7 +227,8 @@
 
 		$('.param-one .metadata-dropdown').entwine({
 			onmatch: function() {
-				var actual = this.siblings('.actual'),
+				var self = this,
+					actual = this.siblings('.actual'),
 					selected = this.find('option[value="' + actual.val() + '"]'),
 					mockTextField = this.siblings('.mock-textfield'),
 					actualParts = null,
@@ -250,6 +258,8 @@
 				}
 
 				mockTextField.updateVisibility();
+
+				setTimeout(function() { actual.updateValue(); }, 200);
 			}, 
 
 			/**

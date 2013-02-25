@@ -139,7 +139,10 @@ class GridFieldConfig_RecordEditor_Personalisation extends GridFieldConfig {
 		//$this->addComponent(new GridFieldDeleteAction());
 		$this->addComponent(new GridFieldPageCount('toolbar-header-right'));
 		$this->addComponent($pagination = new GridFieldPaginator($itemsPerPage));
-		$this->addComponent(new GridFieldDetailForm());
+
+		$gridDetailForm = new GridFieldDetailForm();
+		$gridDetailForm->setItemRequestClass('GridFieldDetailFormPersonalisation_ItemRequest');
+		$this->addComponent($gridDetailForm);
 
 		$sort->setThrowExceptionOnBadDataType(false);
 		$filter->setThrowExceptionOnBadDataType(false);
@@ -148,6 +151,23 @@ class GridFieldConfig_RecordEditor_Personalisation extends GridFieldConfig {
 
 	public function getReports() {
 		return "foo";
+	}
+}
+
+class GridFieldDetailFormPersonalisation_ItemRequest extends GridFieldDetailForm_ItemRequest {
+
+
+	public function __construct($gridField, $component, $record, $popupController, $popupFormName) {
+		$params = Controller::curr()->request->allParams();
+		if($params['ID'] == 'new') {
+			$record = new $params['ModelClass'];
+		}
+		$this->gridField = $gridField;
+		$this->component = $component;
+		$this->record = $record;
+		$this->popupController = $popupController;
+		$this->popupFormName = $popupFormName;
+		parent::__construct($gridField, $component, $record, $popupController, $popupFormName);
 	}
 }
 

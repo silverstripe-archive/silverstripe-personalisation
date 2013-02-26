@@ -34,7 +34,7 @@
 		 * @param callback
 		 */
 		getReportForm: function(reportClass, successCallback, errorCallback) {
-			var url = personalisationReportsBase + "/ReportFormFields/" + reportClass + '/' + CurrentPersonalisationSchemeID;
+			var url = personalisationReportsBase + "/FilterFormFields/" + reportClass + '/' + CurrentPersonalisationSchemeID;
 
 			$.ajax(url, {
 				success: function(data, textStatus, jqXHR) {

@@ -12,10 +12,18 @@ class PersonalisationReport extends ViewableData {
 	}
 
 	/**
-	 * Abstract function that can be used to define a list of form fields. You need to provide report class name and scheme ID in the hidden form fields.
+	 * Abstract function that can be used to define a list of filter form fields. You need to provide report class name and scheme ID in the hidden form fields.
 	 * @return FieldLis
 	 */
-	function ReportFormFields() {
+	function FilterFormFields() {
+		return null;
+	}
+
+	/**
+	 * Abstract function that can be used to define a list of secondary (or advanced) filter form fields.
+	 * @return FieldLis
+	 */
+	function SecondaryFilterFormFields() {
 		return null;
 	}
 

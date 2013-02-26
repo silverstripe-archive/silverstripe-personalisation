@@ -11,7 +11,7 @@ class VariationCountsReport extends PersonalisationReport {
 		return true;
 	}
 
-	function ReportFormFields($scheme = null) {
+	function FilterFormFields($scheme = null) {
 		$now = SS_Datetime::now(); 
 		$lastWeek = Date::create_field('Date', strtotime('last week'));
 

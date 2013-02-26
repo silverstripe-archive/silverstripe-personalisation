@@ -7,7 +7,7 @@ class PersonalisationReportController extends Controller {
 	static $allowed_actions = array(
 		"getReport",
 		"getChartData", 
-		"ReportFormFields"
+		"FilterFormFields"
 	);
 
 	function init() {
@@ -26,11 +26,11 @@ class PersonalisationReportController extends Controller {
 		return $report->render($scheme);
 	}
 
-	function ReportFormFields() {
+	function FilterFormFields() {
 		$params = $this->getParameters();
 		$report = $params["report"];
 		$scheme = $params["scheme"];
-		$fields = $report->ReportFormFields($scheme);
+		$fields = $report->FilterFormFields($scheme);
 
 		$html = '';
 		foreach ($fields as $field) {

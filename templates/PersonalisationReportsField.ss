@@ -8,5 +8,7 @@
 	</ul>
 </div>
 <div class="el-report-detail">
-	<div class="el-chart"></div>
+	<div class="el-form">
+	</div>
+	<div class="el-chart-container"></div>
 </div>

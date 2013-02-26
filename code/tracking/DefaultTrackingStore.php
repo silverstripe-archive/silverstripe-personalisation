@@ -201,11 +201,11 @@ class DefaultTrackingStore implements TrackingStore {
 
 		// Add in date filters if they are present
 		if (isset($params["startTime"])) {
-			$query->where("\"Created\" >= " . date("Y-m-d h:i:s", $params["startTime"]));
+			$query->where("\"Created\" >= '" . date("Y-m-d h:i:s", strtotime($params["startTime"])) . "'");
 		}
 
 		if (isset($params["endTime"])) {
-			$query->where("\"Created\" < " . date("Y-m-d h:i:s", $params["endTime"]));
+			$query->where("\"Created\" < '" . date("Y-m-d h:i:s", strtotime($params["endTime"]))  . "'");
 		}
 
 		if (isset($params["values"])) {

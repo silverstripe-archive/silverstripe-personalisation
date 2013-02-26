@@ -11,14 +11,28 @@ class VariationCountsReport extends PersonalisationReport {
 		return true;
 	}
 
+	function ReportFormFields($scheme = null) {
+		$now = SS_Datetime::now(); 
+		$lastWeek = Date::create_field('Date', strtotime('last week'));
+
+		$fields = FieldList::create(
+			HiddenField::create('SchemeID', '', $scheme ? $scheme->ID : ''),
+			HiddenField::create('ReportName', '', get_class($this)),
+			TextField::create("StartDate", "Start Date", $lastWeek->Format('Y-m-d')),
+			TextField::create("EndDate", "End Date", $now->Format('Y-m-d'))
+		);
+
+		return $fields;
+	}
+
 	/**
 	 * Returns an array of Series. There is a Series for each variation, as well as for
 	 * each measure. Data for all series is across the same time range.
 	 * @return void
 	 */
-	function getReportData($scheme) {
-		$startDate = strtotime("last week");
-		$endDate = strtotime("now");
+	function getReportData($scheme, $params) {
+		$startDate = isset($params['StartDate']) ? $params['StartDate'] : null;
+		$endDate = isset($params['EndDate']) ? $params['EndDate'] : null;
 
 		$chartOptions = array(
 			"chartType" => "line",
@@ -39,16 +53,21 @@ class VariationCountsReport extends PersonalisationReport {
 
 		$prop = $scheme->getRenderProperty();
 
-		// Generate the series
+		// Generate the series	
 		foreach ($scheme->Variations() as $var) {
+			$trackerProps = array(
+				"function" => "getEvents",
+				"params" => array(
+					"property" => $prop,
+					"values" => array($var->ID)
+				)
+			);
+			
+			if($startDate) $trackerProps["params"]["startTime"] = $startDate;
+			if($endDate) $trackerProps["params"]["endTime"] = $endDate;
+
 			$data = Tracker::query(array(
-				array(
-					"function" => "getEvents",
-					"params" => array(
-						"property" => $prop,
-						"values" => array($var->ID)
-					)
-				),
+				$trackerProps,
 				array(
 					"function" => "countByTime",
 					"params" => array(

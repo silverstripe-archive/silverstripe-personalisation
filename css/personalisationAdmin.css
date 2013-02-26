@@ -86,3 +86,7 @@
 .el-report-detail {
 	float: left;
 }
+
+.el-chart-container {
+	margin-top: 2em;
+}

@@ -11,6 +11,14 @@ class PersonalisationReport extends ViewableData {
 		return false;
 	}
 
+	/**
+	 * Abstract function that can be used to define a list of form fields. You need to provide report class name and scheme ID in the hidden form fields.
+	 * @return FieldLis
+	 */
+	function ReportFormFields() {
+		return null;
+	}
+
 	function summaryFields() {
 		return array("Report name" => get_class($this));
 	}

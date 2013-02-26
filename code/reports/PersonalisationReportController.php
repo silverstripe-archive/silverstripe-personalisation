@@ -6,7 +6,8 @@ class PersonalisationReportController extends Controller {
 
 	static $allowed_actions = array(
 		"getReport",
-		"getChartData"
+		"getChartData", 
+		"ReportFormFields"
 	);
 
 	function init() {
@@ -21,7 +22,22 @@ class PersonalisationReportController extends Controller {
 
 		$report = $params["report"];
 		$scheme = $params["scheme"];
+		
 		return $report->render($scheme);
+	}
+
+	function ReportFormFields() {
+		$params = $this->getParameters();
+		$report = $params["report"];
+		$scheme = $params["scheme"];
+		$fields = $report->ReportFormFields($scheme);
+
+		$html = '';
+		foreach ($fields as $field) {
+			$html .= $field->FieldHolder();
+		}
+
+		return $html;
 	}
 
 	/**
@@ -70,7 +86,7 @@ class PersonalisationReportController extends Controller {
 
 		$report = $params["report"];
 		$scheme = $params["scheme"];
-		$result = $report->getReportData($scheme, $params);
+		$result = $report->getReportData($scheme, $_REQUEST);
 /*
 		$chartOptions = array(
 			"chartType" => "line",

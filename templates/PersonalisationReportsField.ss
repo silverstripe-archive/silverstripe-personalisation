@@ -10,5 +10,9 @@
 <div class="el-report-detail">
 	<div class="el-form">
 	</div>
+
+	<div class="el-chart-overview"></div>
+	
 	<div class="el-chart-container"></div>
+
 </div>

@@ -78,6 +78,10 @@
 	}
 
 /** Reporting */
+#Variations label {
+	width: 100%
+}
+
 .el-report-list {
 	width: 25%;
 	height: 100%;
@@ -99,7 +103,7 @@
 }
 
 .el-chart-container {
-	margin-top: 2em;
+	margin-top: 1em;
 }
 
 .report-message {
@@ -121,4 +125,20 @@
 	.secondary-filter-fields .toggle {
 		display: block;
 		margin-bottom: 0.5em;
+	}
+
+
+.el-chart, .el-chart-overview {
+	width: 95%;
+	height: 550px;
+}
+
+.el-chart-overview {
+	height: 50px;
+	padding-left: 30px;
+	margin: 2em 0 1em;
+}
+
+	.el-chart-overview .tickLabel {
+		visibility: hidden;
 	}

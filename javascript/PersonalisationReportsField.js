@@ -7,11 +7,15 @@
 		onclick: function(event) {
 			var reportList = this.parents('.el-report-list'),
 				reportClass = this.attr("data-report-id"),
-				formContainer = $('.el-report-detail .el-form'),
-				chartContainer = $('.el-chart-container');; 
+				reportContainer = $('.el-report-detail'),
+				formContainer = reportContainer.find('.el-form'),
+				chartContainer = reportContainer.find('.el-chart-container'),
+				overviewChartContainer = reportContainer.find('.el-chart-overview'); 
 
 			formContainer.html('<p>Loading...</p>');
 			chartContainer.html('');
+			overviewChartContainer.html('');
+
 			reportList.getReportForm(
 				reportClass, 
 				function(data) {
@@ -57,13 +61,14 @@
 		 */
 		displayReport: function(reportClass, params) {
 			var url = personalisationReportsBase + "/getReport/" + reportClass + "/" + CurrentPersonalisationSchemeID,
-				chartContainer = $('.el-chart-container');
+				chartContainer = $('.el-chart-container'),
+				overviewChartContainer = $('.el-chart-overview');
 
 			chartContainer.html('<p class="report-message report-message-info">Loading...</p>');
+			overviewChartContainer.html('');;
 			$.ajax({
 				url: url,
 				success: function(data, textStatus, jqXHR) {
-					console.log(data);
 					chartContainer.html(data).refreshChart(reportClass, params);
 				},
 
@@ -93,14 +98,60 @@
 				data: params,
 				success: function(data, textStatus, jqXHR) {
 					// parse the json data we get back
-					var p = eval("(" + data + ")");
-					// pass what we get back to flot.
+					var p = eval("(" + data + ")"),
+						graphPlaceholder  = $('.el-chart'),
+						overviewPlaceholder = $(".el-chart-overview"),
+						overviewOptions = {}
 
+					$.extend(p.options, { selection: { mode: "x" } });
+
+					// pass what we get back to flot.
 					if(p.data.length == 0) {
 						chartContainer.html('<p class="report-message report-message-warning">There\'s no data to display.</p>');
 					}
 					else {
-						$.plot($(".el-chart"), p.data, p.options);
+						// Main graph
+						$.plot(graphPlaceholder, p.data, p.options);
+
+						$.extend(overviewOptions, p.options, {
+								lines: {
+									lineWidth: 1
+								}, 
+
+								points: { 
+									radius: 1 
+								},
+
+								grid: { 
+									markings: []
+								},
+
+								legend: {
+									show: false
+								}
+							}
+						);
+
+						// Overview graph
+						var overviewGraph = $.plot(overviewPlaceholder, p.data, overviewOptions);
+
+						graphPlaceholder.bind("plotselected", function (event, ranges) {
+							// do the zooming
+								console.log(ranges.xaxis);
+							$.plot(".el-chart", p.data, $.extend(true, {}, p.options, {
+								xaxis: {
+									min: ranges.xaxis.from,
+									max: ranges.xaxis.to
+								}
+							}));
+
+							overviewGraph.setSelection(ranges, true);
+						});
+
+						overviewPlaceholder.bind("plotselected", function (event, ranges) {
+							graphPlaceholder.trigger('plotselected', ranges);
+
+						});
 					}
 				},
 

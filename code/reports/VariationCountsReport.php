@@ -68,6 +68,9 @@ class VariationCountsReport extends PersonalisationReport {
 			)
 		);
 
+		if($startDate) $chartOptions["xaxis"]["min"] = strtotime($startDate) * 1000; // multiplied by 1000 to covert it to milliseconds
+		if($endDate) $chartOptions["xaxis"]["max"] = strtotime($endDate) * 1000; // multiplied by 1000 to covert it to milliseconds
+
 		$allSeries = array();
 
 		$prop = $scheme->getRenderProperty();

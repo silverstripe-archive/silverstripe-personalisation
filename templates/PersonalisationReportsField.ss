@@ -1,9 +1,9 @@
 <div class="el-report-list">
-	<h2>Available Reports</h2>
+	<h2 class="title">Available Reports</h2>
 
 	<ul>
 		<% loop data %>
-			<li><h3><a href="#" class="report" data-report-ID="$ClassName">$Title</a></h3></li>
+			<li><a href="#" class="report" data-report-ID="$ClassName">$Title</a></li>
 		<% end_loop %>
 	</ul>
 </div>

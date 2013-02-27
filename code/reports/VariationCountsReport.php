@@ -11,7 +11,7 @@ class VariationCountsReport extends PersonalisationReport {
 		return true;
 	}
 
-	function FilterFormFields($scheme = null) {
+	function FilterFormFields($scheme) {
 		$now = SS_Datetime::now(); 
 		$lastWeek = Date::create_field('Date', strtotime('last week'));
 
@@ -25,6 +25,13 @@ class VariationCountsReport extends PersonalisationReport {
 		return $fields;
 	}
 
+	function SecondaryFilterFormFields($scheme) {
+		$variations = $scheme->Variations();
+		$field = new CheckboxSetField("Variations", "Variations", $variations->toArray(), $variations->map()->keys());
+
+		return new FieldList($field);
+	} 
+
 	/**
 	 * Returns an array of Series. There is a Series for each variation, as well as for
 	 * each measure. Data for all series is across the same time range.
@@ -32,7 +39,19 @@ class VariationCountsReport extends PersonalisationReport {
 	 */
 	function getReportData($scheme, $params) {
 		$startDate = isset($params['StartDate']) ? $params['StartDate'] : null;
-		$endDate = isset($params['EndDate']) ? $params['EndDate'] : null;
+		$endDate = isset($params['EndDate']) ? $params['EndDate'] : "today";
+		$variations = isset($params['Variations']) ? $params['Variations'] : array();
+
+		if(!is_array($variations)) $variations = array($variations);
+
+		if(!$startDate) {
+			return array(
+				"errorStatus" => 400,
+				"errorMessage" => 'Start Date is required.',
+				"options" => null,
+				"data" => null,
+			);
+		}
 
 		$chartOptions = array(
 			"chartType" => "line",
@@ -55,6 +74,8 @@ class VariationCountsReport extends PersonalisationReport {
 
 		// Generate the series	
 		foreach ($scheme->Variations() as $var) {
+			if(!in_array($var->ID, $variations)) continue;
+
 			$trackerProps = array(
 				"function" => "getEvents",
 				"params" => array(
@@ -89,10 +110,12 @@ class VariationCountsReport extends PersonalisationReport {
 			);
 			$allSeries[] = $series;
 		}
+
 		$result = array(
 			"options" => $chartOptions,
 			"data" => $allSeries
 		);
+
 		return $result;
 	}
 

@@ -15,7 +15,7 @@
 			reportList.getReportForm(
 				reportClass, 
 				function(data) {
-					data += '<input type="submit" value="Filter" class="el-form-submit" />';
+					data += '<input type="submit" value="Generate graph" class="el-form-submit" />';
 					formContainer.html(data);
 				},
 				function(xhr, status, text) {
@@ -59,15 +59,16 @@
 			var url = personalisationReportsBase + "/getReport/" + reportClass + "/" + CurrentPersonalisationSchemeID,
 				chartContainer = $('.el-chart-container');
 
-			chartContainer.html('<p>Loading...</p>');
+			chartContainer.html('<p class="report-message report-message-info">Loading...</p>');
 			$.ajax({
 				url: url,
 				success: function(data, textStatus, jqXHR) {
+					console.log(data);
 					chartContainer.html(data).refreshChart(reportClass, params);
 				},
 
 				error: function(xhr, status, text) {
-					chartContainer.html('<p>Erro: ' + text + '</p>');
+					chartContainer.html('<p class="report-message report-message-error">Erro: ' + text + '</p>');
 				}
 			});
 		}
@@ -84,7 +85,9 @@
 			// collect parameters
 			// @todo collect parameters
 			// make an ajax request
-			var url = personalisationReportsBase + "/getChartData/" + reportClass + "/" + CurrentPersonalisationSchemeID;
+			var url = personalisationReportsBase + "/getChartData/" + reportClass + "/" + CurrentPersonalisationSchemeID,
+				chartContainer = $('.el-chart-container');
+
 			$.ajax({
 				url: url,
 				data: params,
@@ -93,9 +96,47 @@
 					var p = eval("(" + data + ")");
 					// pass what we get back to flot.
 
-					$.plot($(".el-chart"), p.data, p.options);
+					if(p.data.length == 0) {
+						chartContainer.html('<p class="report-message report-message-warning">There\'s no data to display.</p>');
+					}
+					else {
+						$.plot($(".el-chart"), p.data, p.options);
+					}
+				},
+
+				error: function(xhr, status, text) {
+					chartContainer.html('<p class="report-message report-message-error">Erro: ' + text + '</p>');
 				}
 			});
+		}
+	});
+
+	$('.secondary-filter-fields').entwine({
+		onmatch: function() {
+			this.find('.secondary-filter-fields-wrapper').hide();
+		},
+
+		toogle: function() {
+			var fieldWrapper = this.find('.secondary-filter-fields-wrapper'),
+				toggle = this.find('.toggle');
+
+			if(fieldWrapper.is(':visible')) {
+				fieldWrapper.hide();
+				toggle.text(toggle.attr('data-label-show'));
+			}
+			else {
+				fieldWrapper.show();
+				toggle.text(toggle.attr('data-label-hide'));
+			}
+
+			return false;
+		}
+	});
+
+	$('.secondary-filter-fields .toggle').entwine({
+		onclick: function() {
+			this.parents('.secondary-filter-fields').toogle();
+			return false;
 		}
 	});
 
@@ -108,11 +149,12 @@
 			var container = $(".el-form"),
 				reportList = $(".el-report-list"),
 				reportClass = container.find('[name="ReportName"]').val(),
-				inputs = container.find('input.text, select'),
+				inputs = container.find('input[type!=hidden], select'),
 				params = {};
 
 			inputs.each(function() {
 				var input = $(this);
+				if(input.attr('type') == 'checkbox' && !input.attr('checked')) return false; 
 				params[input.attr('name')] = input.val();
 			});
 

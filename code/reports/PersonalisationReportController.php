@@ -31,10 +31,19 @@ class PersonalisationReportController extends Controller {
 		$report = $params["report"];
 		$scheme = $params["scheme"];
 		$fields = $report->FilterFormFields($scheme);
+		$secFields = $report->SecondaryFilterFormFields($scheme);
 
 		$html = '';
 		foreach ($fields as $field) {
 			$html .= $field->FieldHolder();
+		}
+
+		if($secFields) {
+			$html .= '<div class="secondary-filter-fields"> <a href="#" class="toggle" data-label-show="Show extra fields" data-label-hide="Hide extra fields">Show extra fields</a> <div class="secondary-filter-fields-wrapper">';
+			foreach ($secFields as $field) {
+				$html .= $field->FieldHolder();
+			}			
+			$html .= '</div></div>';
 		}
 
 		return $html;
@@ -87,6 +96,10 @@ class PersonalisationReportController extends Controller {
 		$report = $params["report"];
 		$scheme = $params["scheme"];
 		$result = $report->getReportData($scheme, $_REQUEST);
+
+		if(isset($result['errorStatus'])) {
+			return $this->httpError($result["errorStatus"], $result["errorMessage"]);			
+		}
 /*
 		$chartOptions = array(
 			"chartType" => "line",

@@ -79,14 +79,46 @@
 
 /** Reporting */
 .el-report-list {
-	width: 200px;
+	width: 25%;
+	height: 100%;
 	float: left;
+	overflow: auto;
 }
 
+	.el-report-list .title {
+		margin-top: 0;
+	}
+
+	.el-report-list li a {
+		font-size: 1.2em;
+	}
+
 .el-report-detail {
+	width: 75%;
 	float: left;
 }
 
 .el-chart-container {
 	margin-top: 2em;
 }
+
+.report-message {
+
+}
+
+	.report-message-warning {
+		color: #f26522;
+	}
+
+	.report-message-error {
+		color: #ed1c24;
+	}
+
+.secondary-filter-fields {
+	margin: 2em 0;
+}
+
+	.secondary-filter-fields .toggle {
+		display: block;
+		margin-bottom: 0.5em;
+	}

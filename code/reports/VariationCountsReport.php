@@ -41,6 +41,8 @@ class VariationCountsReport extends PersonalisationReport {
 		$startDate = isset($params['StartDate']) ? $params['StartDate'] : null;
 		$endDate = isset($params['EndDate']) ? $params['EndDate'] : "today";
 		$variations = isset($params['Variations']) ? $params['Variations'] : array();
+		$resolutionFrom = isset($params['resolutionFrom']) ? $params['resolutionFrom'] : null; // in milliseconds
+		$resolutionTo = isset($params['resolutionTo']) ? $params['resolutionTo'] : null; // in milliseconds
 
 		if(!is_array($variations)) $variations = array($variations);
 
@@ -51,6 +53,33 @@ class VariationCountsReport extends PersonalisationReport {
 				"options" => null,
 				"data" => null,
 			);
+		}
+
+		// Calcute an appropriate period depends on the start and end dates
+		$period = null;
+		if(!$period) {
+			if($resolutionFrom && $resolutionTo) {
+				// Passed in from chart zooming
+				$dateDiff = ($resolutionTo - $resolutionFrom) / 1000;
+			}
+			else {
+				// Passed in from filter form
+				$dateDiff = strtotime($endDate) - strtotime($startDate);
+			}
+
+			if($dateDiff <= 60 * 60 /* an hour */) {
+				$period = "minute";
+			}
+			else if($dateDiff <= 60 * 60 * 24 /* a day */) {
+				$period = "hour";	
+			}
+			else if($dateDiff <= 60 * 60 * 24 * 7 * 4 /* 4 weeks */) {
+				$period = "day";	
+			}
+			else if($dateDiff > 60 * 60 * 24 * 7 * 4 /* 4 week */) {
+				$period = "week";	
+			}
+
 		}
 
 		$chartOptions = array(
@@ -95,7 +124,7 @@ class VariationCountsReport extends PersonalisationReport {
 				array(
 					"function" => "countByTime",
 					"params" => array(
-						"period" => "minute"
+						"period" => $period
 					)
 				)
 			));

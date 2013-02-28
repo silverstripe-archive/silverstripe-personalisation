@@ -65,7 +65,7 @@
 				overviewChartContainer = $('.el-chart-overview');
 
 			chartContainer.html('<p class="report-message report-message-info">Loading...</p>');
-			overviewChartContainer.html('');;
+			overviewChartContainer.html('').removeAttr('initialised');
 			$.ajax({
 				url: url,
 				success: function(data, textStatus, jqXHR) {
@@ -86,22 +86,23 @@
 		 * @param 	string
 		 * @param 	literal object
 		 */
-		refreshChart: function(reportClass, params) {
+		refreshChart: function(reportClass, params, callback, errorCallback) {
 			// collect parameters
 			// @todo collect parameters
 			// make an ajax request
-			var url = personalisationReportsBase + "/getChartData/" + reportClass + "/" + CurrentPersonalisationSchemeID,
-				chartContainer = $('.el-chart-container');
+			var self = this, 
+				url = personalisationReportsBase + "/getChartData/" + reportClass + "/" + CurrentPersonalisationSchemeID,
+				chartContainer = $('.el-chart-container'),
+				graphPlaceholder  = $('.el-chart'),
+				overviewPlaceholder = $(".el-chart-overview"),
+				overviewOptions = {};
 
 			$.ajax({
 				url: url,
 				data: params,
 				success: function(data, textStatus, jqXHR) {
 					// parse the json data we get back
-					var p = eval("(" + data + ")"),
-						graphPlaceholder  = $('.el-chart'),
-						overviewPlaceholder = $(".el-chart-overview"),
-						overviewOptions = {}
+					var p = eval("(" + data + ")");
 
 					$.extend(p.options, { selection: { mode: "x" } });
 
@@ -132,20 +133,33 @@
 							}
 						);
 
+						if(typeof callback === 'function') callback(p);
+
 						// Overview graph
-						var overviewGraph = $.plot(overviewPlaceholder, p.data, overviewOptions);
+						if(!overviewPlaceholder.attr('initialised')) {
+							window._personalisationOverviewGraph = $.plot(overviewPlaceholder, p.data, overviewOptions);
+							overviewPlaceholder.attr('initialised', true);
+						}
 
 						graphPlaceholder.bind("plotselected", function (event, ranges) {
-							// do the zooming
-								console.log(ranges.xaxis);
-							$.plot(".el-chart", p.data, $.extend(true, {}, p.options, {
-								xaxis: {
-									min: ranges.xaxis.from,
-									max: ranges.xaxis.to
-								}
-							}));
+							var extraParams = params;
 
-							overviewGraph.setSelection(ranges, true);
+							params['resolutionFrom'] = ranges.xaxis.from;
+							params['resolutionTo'] = ranges.xaxis.to;
+							self.refreshChart(reportClass, params, function(p) {
+								// do the zooming
+								$.plot(".el-chart", p.data, $.extend(true, {}, p.options, {
+									xaxis: {
+										min: ranges.xaxis.from,
+										max: ranges.xaxis.to
+									}
+								}));
+
+							});
+							
+							$(this).unbind('plotselected'); // to release resources in this closure
+
+							window._personalisationOverviewGraph.setSelection(ranges, true);
 						});
 
 						overviewPlaceholder.bind("plotselected", function (event, ranges) {
@@ -153,6 +167,7 @@
 
 						});
 					}
+
 				},
 
 				error: function(xhr, status, text) {

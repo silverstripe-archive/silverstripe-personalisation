@@ -108,6 +108,7 @@ class PersonalisationAdmin extends ModelAdmin {
 		Requirements::javascript("personalisation/thirdparty/flot-0.7/jquery.flot.js");
 		Requirements::javascript("personalisation/thirdparty/flot-0.7/jquery.flot.time.js");
 		Requirements::javascript("personalisation/thirdparty/flot-0.7/jquery.flot.selection.js");
+		Requirements::javascript("personalisation/thirdparty/flot-0.7/jquery.flot.resize.js");
 		Requirements::customScript(
 			"var personalisationReportsBase='" . PersonalisationReportController::$base_link . "';"
 		);

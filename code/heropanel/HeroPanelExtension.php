@@ -1,21 +1,23 @@
 <?php
-class HeroPanelExtension extends DataExtension{
+class HeroPanelExtension extends DataExtension
+{
 
-	static $has_many = array(
-		"HeroItems" => "HeroPanelItem"
-	);
+    public static $has_many = array(
+        "HeroItems" => "HeroPanelItem"
+    );
 
-	function updateCMSFields(FieldList $fields){
-		Requirements::javascript('personalisation/javascript/personalisationAdmin.js');
+    public function updateCMSFields(FieldList $fields)
+    {
+        Requirements::javascript('personalisation/javascript/personalisationAdmin.js');
 
-		$heroItemsField = new GridField("HeroItems", "Items", $this->owner->HeroItems(), GridFieldConfig_RecordEditor::create());
-		$fields->addFieldToTab("Root.HeroPanel", $heroItemsField);
-	}
+        $heroItemsField = new GridField("HeroItems", "Items", $this->owner->HeroItems(), GridFieldConfig_RecordEditor::create());
+        $fields->addFieldToTab("Root.HeroPanel", $heroItemsField);
+    }
 
-	function HeroPanel(){
-		Requirements::css("personalisation/javascript/jsImgSlider/themes/1/js-image-slider.css");
-		$heroItems = $this->owner->getComponents("HeroItems")->Sort("Sequence");
-		return $this->owner->customise(array("HeroItems" =>  $heroItems))->renderWith("HeroPanel");
-	}
-
+    public function HeroPanel()
+    {
+        Requirements::css("personalisation/javascript/jsImgSlider/themes/1/js-image-slider.css");
+        $heroItems = $this->owner->getComponents("HeroItems")->Sort("Sequence");
+        return $this->owner->customise(array("HeroItems" =>  $heroItems))->renderWith("HeroPanel");
+    }
 }

@@ -9,19 +9,21 @@
  * @todo timelines and amount of data, and what it means for the condition. is there a standard filter applied to the
  * @todo data that is tested? how much sits in the tracking store, and how much out of it?
  */
-class RuleMeasure extends PersonalisationMeasure {
+class RuleMeasure extends PersonalisationMeasure
+{
 
-	static $db = array(
-		// json encoded object represents an array of BasicPersonalisationCondition objects.
-		"EncodedCondition" => "Text"
-	);
+    public static $db = array(
+        // json encoded object represents an array of BasicPersonalisationCondition objects.
+        "EncodedCondition" => "Text"
+    );
 
-	/**
-	 * Returns 1 or 0 depending on weather the rule is true for the site user identified by one of the
-	 * identities.
-	 * @param $identities
-	 * @return void
-	 */
-	function getValue($identities) {
-	}
+    /**
+     * Returns 1 or 0 depending on weather the rule is true for the site user identified by one of the
+     * identities.
+     * @param $identities
+     * @return void
+     */
+    public function getValue($identities)
+    {
+    }
 }

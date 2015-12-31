@@ -5,19 +5,23 @@
  * where A/B testing is required for one of the personalised options only (e.g. testing response a customer segment).
  * So for one of the variations, an A/B testing variation invoked.
  */
-class NestedVariation extends PersonalisationVariation {
+class NestedVariation extends PersonalisationVariation
+{
 
-	static $has_one = array(
-		"Scheme" => "PersonalisationScheme"
-	);
+    public static $has_one = array(
+        "Scheme" => "PersonalisationScheme"
+    );
 
-	function render(ContextProvider $context, Controller $controller = null) {
-		if (!$this->SchemeID) return "";
-		return $this->Scheme()->personalise($controller);
-	}
+    public function render(ContextProvider $context, Controller $controller = null)
+    {
+        if (!$this->SchemeID) {
+            return "";
+        }
+        return $this->Scheme()->personalise($controller);
+    }
 
-	function helperText() {
-		return "lets you use another scheme as the output, e.g. to A/B test one of your variations.";
-	}
-
+    public function helperText()
+    {
+        return "lets you use another scheme as the output, e.g. to A/B test one of your variations.";
+    }
 }

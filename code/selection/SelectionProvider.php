@@ -1,5 +1,6 @@
 <?php
 
-interface SelectionProvider {
-	function getVariation(ContextProvider $context, PersonalisationSource $source);
+interface SelectionProvider
+{
+    public function getVariation(ContextProvider $context, PersonalisationSource $source);
 }

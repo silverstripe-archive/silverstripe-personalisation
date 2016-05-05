@@ -8,51 +8,56 @@
  * cookie. These are not merged at this level, and are not understood to be equivalent here. The equivalence is
  * represented in tracking stores.
  */
-class TrackingIdentity extends DataObject {
+class TrackingIdentity extends DataObject
+{
 
-	static $db = array(
-		// An identifier of the domain of the identity, which is typically an external system that generated the
-		// identity value (e.g. perhaps a google tracking ID, if we know it), but can be the SilverStripe instance
-		// itself. Logically this is an enum, but we don't know values ahead of time. The values come from getType on
-		// the TrackingIdentityFinder instances.
-		"IdentityDomain" => "Varchar(50)",
-		"IdentityValue" => "Varchar(255)"
-	);
+    public static $db = array(
+        // An identifier of the domain of the identity, which is typically an external system that generated the
+        // identity value (e.g. perhaps a google tracking ID, if we know it), but can be the SilverStripe instance
+        // itself. Logically this is an enum, but we don't know values ahead of time. The values come from getType on
+        // the TrackingIdentityFinder instances.
+        "IdentityDomain" => "Varchar(50)",
+        "IdentityValue" => "Varchar(255)"
+    );
 
-	function getType() {
-		return $this->IdentityDomain;
-	}
+    public function getType()
+    {
+        return $this->IdentityDomain;
+    }
 
-	function getIdentifier() {
-		return $this->ID;
-	}
+    public function getIdentifier()
+    {
+        return $this->ID;
+    }
 
-	/**
-	 * Get an identity. Return null if there is no match.
-	 * @static
-	 * @param $domain
-	 * @param $id
-	 * @return
-	 */
-	static function get_identity($domain, $id) {
-		return TrackingIdentity::get()
-			->filter("IdentityDomain", $domain)
-			->filter("IdentityValue", $id)
-			->First();
-	}
+    /**
+     * Get an identity. Return null if there is no match.
+     * @static
+     * @param $domain
+     * @param $id
+     * @return
+     */
+    public static function get_identity($domain, $id)
+    {
+        return TrackingIdentity::get()
+            ->filter("IdentityDomain", $domain)
+            ->filter("IdentityValue", $id)
+            ->First();
+    }
 
-	/**
-	 * Create an identity and return it.
-	 * @static
-	 * @param $domain
-	 * @param $id
-	 * @return void
-	 */
-	static function create_identity($domain, $id) {
-		$item = new TrackingIdentity();
-		$item->IdentityDomain = $domain;
-		$item->IdentityValue = $id;
-		$item->write();
-		return $item;
-	}
+    /**
+     * Create an identity and return it.
+     * @static
+     * @param $domain
+     * @param $id
+     * @return void
+     */
+    public static function create_identity($domain, $id)
+    {
+        $item = new TrackingIdentity();
+        $item->IdentityDomain = $domain;
+        $item->IdentityValue = $id;
+        $item->write();
+        return $item;
+    }
 }
